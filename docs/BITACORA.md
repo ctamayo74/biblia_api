@@ -17,7 +17,8 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
 | **7** | 2026-11-14 | Capa de acceso a API.Bible y Route Handlers proxy | Tipos en `src/types/bible.ts`, cliente servidor en `src/lib/bible.ts` y 5 Route Handlers | `c12cd87` |
 | **8** | 2026-11-14 | Layout global, navegación móvil/escritorio y rutas base | `Header`, `BottomNav`, `Footer`, fuentes serif/sans y 5 rutas | `4eb2735` |
 | **9** | 2026-11-14 | Implementación de portada (`/`) con versículo diario | `src/data/verses.ts`, `src/lib/daily.ts`, `VerseCard`, `ShareButton` y PPR | `0af818f` |
-| **10** | 2026-11-14 | Módulo de lectura `/leer` con libros, capítulos y visor | `/leer`, `/leer/[bookId]`, `/leer/[bookId]/[chapterId]`, `VersionSelector`, `FontSizeControl` | *Pendiente de commit* |
+| **10** | 2026-11-14 | Módulo de lectura `/leer` con libros, capítulos y visor | `/leer`, `/leer/[bookId]`, `/leer/[bookId]/[chapterId]`, `VersionSelector`, `FontSizeControl` | `5c6d90c` |
+| **11** | 2026-11-14 | Política de documentación previa de cada pedido | Bitácora actualizada al inicio de cada solicitud | `089581b` |
 
 ---
 
@@ -176,3 +177,14 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
   - Configuración de suspensión con `Partial Prerendering (PPR)` en Next.js 16 para streaming de contenido dinámico.
   - Verificación exitosa de compilación (`16/16` rutas válidas).
 * **Archivos clave**: `src/lib/canon.ts`, `src/components/VersionSelector.tsx`, `src/components/FontSizeControl.tsx`, `src/components/ChapterReader.tsx`, `src/app/leer/**/page.tsx`.
+* **Commit**: `5c6d90c` (`feat(leer): agrega lector por libro y capítulo con selector de versión y tamaño de letra`).
+
+---
+
+### Pedido 11: Política de Documentación Previa de Cada Pedido
+* **Solicitud**: Documentar en `docs/BITACORA.md` cada petición del usuario **antes** de comenzar a resolverla, manteniendo el registro cronológico siempre al día.
+* **Acciones ejecutadas**:
+  - Actualización del índice de entregas con el commit real del Pedido 10 (`5c6d90c`).
+  - Alta de esta política como procedimiento permanente del proyecto: cada nueva solicitud se registra primero (índice + detalle) y luego se ejecuta.
+  - Registro del estado *Pendiente de commit* hasta cerrar cada pedido con su commit convencional.
+* **Archivos clave**: `docs/BITACORA.md`.
