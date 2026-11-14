@@ -21,6 +21,7 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
 | **11** | 2026-11-14 | Política de documentación previa de cada pedido | Bitácora actualizada al inicio de cada solicitud | `ecd84b2` |
 | **12** | 2026-11-14 | Módulo de memorización con modos, niveles y racha | `/memorizar`, `MemorizationPractice`, ejercicios por modo, `useMemorizationProgress` | `cef8c11` |
 | **13** | 2026-11-14 | Re-especificación de `/memorizar` (lista, dominio 0-3, hook SSR) | `useLocalStorage`, `VerseList`, `PracticeCard`, `StreakBadge`, `AddVerseForm` | `bd2554b` |
+| **14** | 2026-11-14 | Guía de evangelismo paso a paso (`/evangelizar`) | `src/data/evangelio.ts`, `StepNavigator`, recorrido de 6 pasos con oración | *Pendiente de commit* |
 
 ---
 
@@ -240,3 +241,23 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
   - Verificación: pruebas de lógica pura en Node (31/31 OK: validación, acierto, ocultamiento, racha y dominio), `npm run build` OK (`○ /memorizar` estático) y smoke test con `next start` (`/memorizar`, `?ref=JHN.3.16` y `/api/verse`).
 * **Archivos clave**: `src/hooks/useLocalStorage.ts`, `src/types/memorization.ts`, `src/lib/memorization.ts`, `src/components/memorizar/*`, `src/app/memorizar/page.tsx`.
 * **Commit**: `bd2554b` (`feat(memorizar): reimplementa modulo con lista, dominio 0-3 y hook useLocalStorage SSR`).
+
+---
+
+### Pedido 14: Guía de Evangelismo Paso a Paso (`/evangelizar`)
+* **Solicitud**: Implementar `/evangelizar` como una guía para compartir el evangelio:
+  1. `src/data/evangelio.ts`: ruta de **6 pasos** con su versículo cada uno (Dios te ama `JHN.3.16`, todos pecamos `ROM.3.23`, el castigo del pecado `ROM.6.23`, Cristo murió por nosotros `ROM.5.8`, la salvación es por gracia `EPH.2.8-9`, recibir a Cristo `ROM.10.9-10`).
+  2. Página (**Server Component**) que obtiene los pasajes con `getPassage` y los muestra como recorrido paso a paso con tarjetas.
+  3. Client Component `StepNavigator` para avanzar y retroceder, con indicador de progreso.
+  4. Botón **"Compartir este paso"** y un cierre con invitación a orar (oración sugerida) y sección **"Siguientes pasos"** que lleve a `/discipulado`.
+  5. Tono **pastoral, sencillo y respetuoso**.
+* **Acciones ejecutadas**:
+  - Ruta de datos en [`src/data/evangelio.ts`](../src/data/evangelio.ts): 6 pasos tipados (`EVANGELISM_STEPS`) con título pastoral, `passageId`, referencia legible y mensaje breve; más el cierre (`EVANGELISM_CLOSING`) con oración sugerida y `nextSteps`.
+  - Tipos en [`src/types/evangelism.ts`](../src/types/evangelism.ts): `EvangelismStep`, `JourneyStep` (con el texto ya resuelto), `NextStep` y `JourneyClosing`.
+  - Página [`src/app/evangelizar/page.tsx`](../src/app/evangelizar/page.tsx): Server Component con `metadata`, encabezado y `Suspense`; el componente `EvangelismJourney` usa `connection()` y `Promise.allSettled` + `getPassage` para traer los 6 pasajes (con respaldo amable si alguno falla), siguiendo el patrón PPR del inicio.
+  - Componentes en [`src/components/evangelizar/`](../src/components/evangelizar/): `ProgressIndicator` (barra + contador), `StepCard` (título, explicación, versículo y "Compartir este paso"), `ClosingSection` (oración e invitación) y el Client Component [`StepNavigator.tsx`](../src/components/evangelizar/StepNavigator.tsx) que avanza/retrocede con `useState` y `aria-live`.
+  - Reutilización de [`ShareButton.tsx`](../src/components/ShareButton.tsx): se añadió la prop opcional `label` (para "Compartir este paso") y se retiró el import sin usar `Copy`.
+  - **Formato de rangos**: los pasajes con rango deben repetir libro y capítulo (`EPH.2.8-EPH.2.9`, `ROM.10.9-ROM.10.10`); la forma abreviada (`EPH.2.8-9`) devuelve HTTP 502 (400 de API.Bible). Verificado contra la API en vivo.
+  - Verificación: `npm run build` OK (`◐ /evangelizar` Partial Prerender), smoke test con `next start` (HTTP 200 con los 6 pasajes, referencias, "Paso 1 de 6" y "Compartir este paso" en el HTML; el cierre en el bundle cliente) y `npm run lint` sin hallazgos nuevos.
+* **Archivos clave**: `src/data/evangelio.ts`, `src/types/evangelism.ts`, `src/components/evangelizar/*`, `src/app/evangelizar/page.tsx`, `src/components/ShareButton.tsx`.
+* **Commit**: *(pendiente)*

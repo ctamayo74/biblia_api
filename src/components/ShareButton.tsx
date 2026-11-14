@@ -1,15 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { Share2, Check, Copy } from "lucide-react";
+import { Share2, Check } from "lucide-react";
 
 interface ShareButtonProps {
   reference: string;
   text: string;
   className?: string;
+  /** Texto visible del botón (por defecto "Compartir"). */
+  label?: string;
 }
 
-export function ShareButton({ reference, text, className = "" }: ShareButtonProps) {
+export function ShareButton({
+  reference,
+  text,
+  className = "",
+  label = "Compartir",
+}: ShareButtonProps) {
   const [copied, setCopied] = useState(false);
 
   async function handleShare() {
@@ -50,7 +57,7 @@ export function ShareButton({ reference, text, className = "" }: ShareButtonProp
       type="button"
       onClick={handleShare}
       className={`inline-flex min-h-[44px] min-w-[44px] items-center justify-center gap-2 rounded-xl border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-stone-700 shadow-2xs transition-all hover:bg-stone-50 active:scale-95 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-200 dark:hover:bg-stone-700 ${className}`}
-      aria-label={copied ? "Copiado al portapapeles" : "Compartir versículo"}
+      aria-label={copied ? "Copiado al portapapeles" : `${label} ${reference}`}
     >
       {copied ? (
         <>
@@ -60,7 +67,7 @@ export function ShareButton({ reference, text, className = "" }: ShareButtonProp
       ) : (
         <>
           <Share2 className="h-4 w-4 text-stone-500 dark:text-stone-400" aria-hidden="true" />
-          <span>Compartir</span>
+          <span>{label}</span>
         </>
       )}
     </button>
