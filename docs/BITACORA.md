@@ -20,7 +20,7 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
 | **10** | 2026-11-14 | Módulo de lectura `/leer` con libros, capítulos y visor | `/leer`, `/leer/[bookId]`, `/leer/[bookId]/[chapterId]`, `VersionSelector`, `FontSizeControl` | `5c6d90c` |
 | **11** | 2026-11-14 | Política de documentación previa de cada pedido | Bitácora actualizada al inicio de cada solicitud | `ecd84b2` |
 | **12** | 2026-11-14 | Módulo de memorización con modos, niveles y racha | `/memorizar`, `MemorizationPractice`, ejercicios por modo, `useMemorizationProgress` | `cef8c11` |
-| **13** | 2026-11-14 | Re-especificación de `/memorizar` (lista, dominio 0-3, hook SSR) | `useLocalStorage`, `VerseList`, `PracticeCard`, `StreakBadge`, `AddVerseForm` | *Pendiente de commit* |
+| **13** | 2026-11-14 | Re-especificación de `/memorizar` (lista, dominio 0-3, hook SSR) | `useLocalStorage`, `VerseList`, `PracticeCard`, `StreakBadge`, `AddVerseForm` | `bd2554b` |
 
 ---
 
@@ -239,3 +239,4 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
   - **Corrección (Fix)**: el patrón de referencia no aceptaba libros numerados de dos letras (`1CO.10.13`, `2TI.3.16`, `1JN.4.19`); se ajustó a `^(?:[1-3][A-Z]{2}|[A-Z]{3})\.\d{1,3}\.\d{1,3}$`.
   - Verificación: pruebas de lógica pura en Node (31/31 OK: validación, acierto, ocultamiento, racha y dominio), `npm run build` OK (`○ /memorizar` estático) y smoke test con `next start` (`/memorizar`, `?ref=JHN.3.16` y `/api/verse`).
 * **Archivos clave**: `src/hooks/useLocalStorage.ts`, `src/types/memorization.ts`, `src/lib/memorization.ts`, `src/components/memorizar/*`, `src/app/memorizar/page.tsx`.
+* **Commit**: `bd2554b` (`feat(memorizar): reimplementa modulo con lista, dominio 0-3 y hook useLocalStorage SSR`).
