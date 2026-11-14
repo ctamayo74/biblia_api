@@ -23,7 +23,7 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
 | **13** | 2026-11-14 | Re-especificación de `/memorizar` (lista, dominio 0-3, hook SSR) | `useLocalStorage`, `VerseList`, `PracticeCard`, `StreakBadge`, `AddVerseForm` | `bd2554b` |
 | **14** | 2026-11-14 | Guía de evangelismo paso a paso (`/evangelizar`) | `src/data/evangelio.ts`, `StepNavigator`, recorrido de 6 pasos con oración | `9f06b10` |
 | **15** | 2026-11-14 | Plan de discipulado de 7 días (`/discipulado`) | `plan-discipulado.ts`, `DayCheckbox`, progreso y notas en localStorage | `59c8f9b` |
-| **16** | 2026-11-14 | Búsqueda de la Biblia (`/buscar`) | `SearchForm` con debounce y `AbortController`, enlace en la navegación | *Pendiente de commit* |
+| **16** | 2026-11-14 | Búsqueda de la Biblia (`/buscar`) | `SearchForm` con debounce y `AbortController`, enlace en la navegación | `ea89498` |
 
 ---
 
@@ -302,4 +302,4 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
   - **Reutilización**: el botón "Memorizar" aprovecha que [`MemorizationTool`](../src/components/memorizar/MemorizationTool.tsx) ya procesa el parámetro `?ref=` (normaliza, valida y agrega el versículo).
   - Verificación: `npm run build` OK (`○ /buscar` estático); smoke test con `next start`: `/buscar` responde `200` con el formulario, la navegación incluye `href="/buscar"`, `/api/search?q=esperanza` devuelve 10 versículos (total 290), `/api/search` sin `q` responde `400` con mensaje en español, `/leer/PSA/PSA.119` carga el capítulo y `npm run lint` sin hallazgos nuevos (se retiró un `eslint-disable` innecesario en `SearchForm`).
 * **Archivos clave**: `src/app/buscar/page.tsx`, `src/components/buscar/*`, `src/components/Header.tsx`, `src/components/BottomNav.tsx`.
-* **Commit**: *(pendiente)*
+* **Commit**: `ea89498` (`feat(buscar): busqueda de la Biblia con debounce, estados y acciones por resultado`).
