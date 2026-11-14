@@ -24,6 +24,7 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
 | **14** | 2026-11-14 | Guía de evangelismo paso a paso (`/evangelizar`) | `src/data/evangelio.ts`, `StepNavigator`, recorrido de 6 pasos con oración | `9f06b10` |
 | **15** | 2026-11-14 | Plan de discipulado de 7 días (`/discipulado`) | `plan-discipulado.ts`, `DayCheckbox`, progreso y notas en localStorage | `59c8f9b` |
 | **16** | 2026-11-14 | Búsqueda de la Biblia (`/buscar`) | `SearchForm` con debounce y `AbortController`, enlace en la navegación | `ea89498` |
+| **17** | 2026-11-14 | Estados de carga y error con convenciones de App Router | `loading.tsx`, `error.tsx`, `not-found.tsx` y `global-error.tsx` | *Pendiente de commit* |
 
 ---
 
@@ -303,3 +304,33 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
   - Verificación: `npm run build` OK (`○ /buscar` estático); smoke test con `next start`: `/buscar` responde `200` con el formulario, la navegación incluye `href="/buscar"`, `/api/search?q=esperanza` devuelve 10 versículos (total 290), `/api/search` sin `q` responde `400` con mensaje en español, `/leer/PSA/PSA.119` carga el capítulo y `npm run lint` sin hallazgos nuevos (se retiró un `eslint-disable` innecesario en `SearchForm`).
 * **Archivos clave**: `src/app/buscar/page.tsx`, `src/components/buscar/*`, `src/components/Header.tsx`, `src/components/BottomNav.tsx`.
 * **Commit**: `ea89498` (`feat(buscar): busqueda de la Biblia con debounce, estados y acciones por resultado`).
+
+---
+
+### Pedido 17: Estados de Carga y Error (convenciones de App Router)
+* **Solicitud**: Agregar el manejo de estados de carga y error con las convenciones de App Router:
+  1. `loading.tsx` en la raíz y en `/leer`, `/leer/[bookId]`, `/leer/[bookId]/[chapterId]`, `/evangelizar` y `/discipulado/[dia]`, con **skeletons animados** de Tailwind (`animate-pulse`) que imiten el diseño real.
+  2. `error.tsx` (Client Component, recibe `error` y `reset`) en la raíz y en los segmentos con llamadas a la API: mensaje amable en español, botón **"Reintentar"** que llama a `reset()`, sin mostrar detalles técnicos al usuario (loguear el error en consola).
+  3. `not-found.tsx` global con enlace de regreso al inicio.
+  4. `global-error.tsx` para errores del layout raíz.
+  5. Simular un fallo (por ejemplo una API key inválida temporal) para verificar que la UI de error aparece, y luego restaurarla.
+* **Acciones ejecutadas**:
+  - **Skeletons compartidos** en [`src/components/skeletons/`](../src/components/skeletons/): `HomeSkeleton` (`VerseCardSkeleton`), `BooksSkeleton` (`BooksGridSkeleton`), `BookChaptersSkeleton` (`ChaptersGridSkeleton`), `ChapterSkeleton` (`ChapterLoadingSkeleton`), `EvangelismSkeleton` (`JourneySkeleton`) y `DiscipleshipDaySkeleton` (`PassageSkeleton`). Todos usan `animate-pulse` de Tailwind y `aria-hidden="true"`, e imitan el diseño real (encabezados, tarjetas, cuadrículas y navegación).
+  - **`loading.tsx`** (6): [`src/app/loading.tsx`](../src/app/loading.tsx), [`leer/loading.tsx`](../src/app/leer/loading.tsx), [`leer/[bookId]/loading.tsx`](../src/app/leer/[bookId]/loading.tsx), [`leer/[bookId]/[chapterId]/loading.tsx`](../src/app/leer/[bookId]/[chapterId]/loading.tsx), [`evangelizar/loading.tsx`](../src/app/evangelizar/loading.tsx) y [`discipulado/[dia]/loading.tsx`](../src/app/discipulado/[dia]/loading.tsx). Cada uno es un componente de servidor que delega en el skeleton correspondiente.
+  - **Refactor (DRY)**: las 6 páginas (`page.tsx` de `/`, `/leer`, `/leer/[bookId]`, `/leer/[bookId]/[chapterId]`, `/evangelizar` y `/discipulado/[dia]`) dejaron de definir skeletons locales y ahora **importan los compartidos**, reutilizándolos tanto en sus `Suspense` como en los `loading.tsx`.
+  - **UI de error reutilizable** en [`src/components/errors/ErrorState.tsx`](../src/components/errors/ErrorState.tsx) (Client Component): recibe `error`, `reset` y un `title` contextual; registra el error con `console.error` (sin exponerlo al usuario), muestra un mensaje amable en español y ofrece los botones **"Reintentar"** (`onClick={() => reset()}`) y **"Volver al inicio"**.
+  - **`error.tsx`** (8, Client Components) que son envoltorios delgados de `ErrorState` con título contextual: [`src/app/error.tsx`](../src/app/error.tsx) (raíz), [`leer/error.tsx`](../src/app/leer/error.tsx), [`leer/[bookId]/error.tsx`](../src/app/leer/[bookId]/error.tsx), [`leer/[bookId]/[chapterId]/error.tsx`](../src/app/leer/[bookId]/[chapterId]/error.tsx), [`evangelizar/error.tsx`](../src/app/evangelizar/error.tsx), [`discipulado/[dia]/error.tsx`](../src/app/discipulado/[dia]/error.tsx), [`memorizar/error.tsx`](../src/app/memorizar/error.tsx) y [`buscar/error.tsx`](../src/app/buscar/error.tsx).
+  - **`not-found.tsx`** global en [`src/app/not-found.tsx`](../src/app/not-found.tsx): Server Component con `metadata` ("Página no encontrada"), ilustración, código 404 y enlace "Volver al inicio".
+  - **`global-error.tsx`** en [`src/app/global-error.tsx`](../src/app/global-error.tsx): define sus propias etiquetas `<html>`/`<body>` e importa `./globals.css` (reemplaza el layout raíz); usa el componente `<title>` en lugar de `metadata`; registra el error en consola y ofrece "Reintentar".
+  - **Nota de API (Next 16)**: en esta versión el prop estable del boundary es `retry`; `reset` sigue disponible y documentado. Siguiendo la solicitud explícita del usuario, los `error.tsx` usan `reset()`.
+  - **Verificación**:
+    - `npm run build` OK: las 25 rutas compilan; se generan `◐` (PPR) para `/`, `/leer`, `/leer/[bookId]`, `/leer/[bookId]/[chapterId]`, `/evangelizar` y `/discipulado/[dia]`; `_global-error` queda compilado.
+    - `npm run lint`: sin hallazgos nuevos (persisten 2 errores y 3 warnings preexistentes en `ChapterReader`, `VersionSelector` y `FontSizeControl`).
+    - **Regresión** (clave válida, `next start`): las 9 rutas responden `200`; la UI de error **no** aparece.
+    - **404 global**: `/ruta-que-no-existe` → HTTP `404` con "No encontramos esta página", "Volver al inicio" y `meta robots noindex`.
+    - **Skeletons**: el shell estático (PPR) de cada ruta incluye los bloques `animate-pulse` (p. ej. `/leer` 13, `/leer/PSA/PSA.23` 17, `/discipulado/1` 31).
+    - **Fallo simulado (requisito 5)**: se sustituyó temporalmente `BIBLE_API_KEY` por una clave inválida y se vació `.next/cache`; con la clave inválida la API responde `403 Forbidden`. Como bajo `cacheComponents`/PPR el error viaja en el payload RSC y lo renderiza el **cliente**, la verificación se hizo con **Chromium headless (Playwright)** en lugar de `curl`. Resultado: la UI de error aparece con el título correcto, el botón "Reintentar" y "Volver al inicio", **sin fugas** de detalles técnicos (`BIBLE_API_KEY`, `403 Forbidden`, `Invalid API key`, `digest`, etc.):
+      - `/` → "Algo salió mal"; `/leer` → "No pudimos cargar la lectura"; `/leer/PSA` → "No pudimos cargar los capítulos"; `/leer/PSA/PSA.23` → "No pudimos cargar el capítulo"; `/discipulado/1` → "No pudimos cargar este día". (`PASS` en todos.)
+      - **`/evangelizar`**: por diseño usa `Promise.allSettled`, de modo que **degrada con gracia** (muestra los pasos con el texto vacío) en vez de lanzar; su `error.tsx` queda como red de seguridad ante errores de render inesperados.
+    - **Restauración**: `BIBLE_API_KEY` se restauró desde el respaldo y se volvió a vaciar `.next/cache`; se confirmó que la UI de error desaparece y todas las rutas vuelven a renderizar con normalidad.
+* **Archivos clave**: `src/components/skeletons/*`, `src/components/errors/ErrorState.tsx`, `src/app/loading.tsx`, `src/app/error.tsx`, `src/app/global-error.tsx`, `src/app/not-found.tsx`, `src/app/leer/**/loading.tsx`, `src/app/leer/**/error.tsx`, `src/app/evangelizar/{loading,error}.tsx`, `src/app/discipulado/[dia]/{loading,error}.tsx`, `src/app/memorizar/error.tsx`, `src/app/buscar/error.tsx`.

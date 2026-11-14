@@ -8,6 +8,7 @@ import {
   EVANGELISM_STEPS,
 } from "@/data/evangelio";
 import { StepNavigator } from "@/components/evangelizar/StepNavigator";
+import { JourneySkeleton } from "@/components/skeletons/EvangelismSkeleton";
 import type { JourneyStep } from "@/types/evangelism";
 
 export const metadata: Metadata = {
@@ -17,27 +18,6 @@ export const metadata: Metadata = {
 };
 
 const DEFAULT_BIBLE_ID = process.env.BIBLE_DEFAULT_ID || "826f63861180e056-01";
-
-function JourneySkeleton() {
-  return (
-    <div aria-hidden="true" className="flex flex-col gap-6 animate-pulse">
-      <div className="h-8 rounded-full bg-stone-200 dark:bg-stone-800" />
-      <div className="flex flex-col gap-6 rounded-3xl border border-stone-200/90 bg-stone-100/50 p-6 sm:p-8 dark:border-stone-800 dark:bg-stone-900/40">
-        <div className="h-6 w-32 rounded-full bg-stone-200 dark:bg-stone-800" />
-        <div className="h-7 w-3/4 rounded bg-stone-200 dark:bg-stone-800" />
-        <div className="space-y-3">
-          <div className="h-5 w-full rounded bg-stone-200 dark:bg-stone-800" />
-          <div className="h-5 w-4/5 rounded bg-stone-200 dark:bg-stone-800" />
-        </div>
-        <div className="h-11 w-48 rounded-xl bg-stone-200 dark:bg-stone-800" />
-      </div>
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <div className="h-11 flex-1 rounded-xl bg-stone-200 dark:bg-stone-800" />
-        <div className="h-11 flex-1 rounded-xl bg-stone-200 dark:bg-stone-800" />
-      </div>
-    </div>
-  );
-}
 
 async function EvangelismJourney() {
   await connection();

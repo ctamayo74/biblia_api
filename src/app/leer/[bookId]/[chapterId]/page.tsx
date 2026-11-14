@@ -5,24 +5,11 @@ import { ChevronRight, Home, BookOpen } from "lucide-react";
 import { getChapter, getBook } from "@/lib/bible";
 import { ChapterReader } from "@/components/ChapterReader";
 import { VersionSelector } from "@/components/VersionSelector";
+import { ChapterLoadingSkeleton } from "@/components/skeletons/ChapterSkeleton";
 
 interface ChapterPageProps {
   params: Promise<{ bookId: string; chapterId: string }>;
   searchParams: Promise<{ bibleId?: string }>;
-}
-
-function ChapterLoadingSkeleton() {
-  return (
-    <div className="mx-auto flex w-full max-w-[65ch] flex-col gap-6 animate-pulse py-4">
-      <div className="h-4 w-48 rounded bg-stone-200 dark:bg-stone-800" />
-      <div className="h-8 w-64 mx-auto rounded bg-stone-200 dark:bg-stone-800" />
-      <div className="space-y-4">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="h-5 w-full rounded bg-stone-200 dark:bg-stone-800" />
-        ))}
-      </div>
-    </div>
-  );
 }
 
 async function ChapterContent({

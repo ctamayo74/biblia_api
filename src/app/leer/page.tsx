@@ -5,6 +5,7 @@ import { BookOpen } from "lucide-react";
 import { getBooks } from "@/lib/bible";
 import { partitionBooks } from "@/lib/canon";
 import { VersionSelector } from "@/components/VersionSelector";
+import { BooksGridSkeleton } from "@/components/skeletons/BooksSkeleton";
 import type { Book } from "@/types/bible";
 
 interface LeerPageProps {
@@ -29,19 +30,6 @@ function BooksGrid({ books, bibleId }: { books: Book[]; bibleId: string }) {
             {book.name}
           </span>
         </Link>
-      ))}
-    </div>
-  );
-}
-
-function BooksGridSkeleton() {
-  return (
-    <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 md:grid-cols-4 animate-pulse">
-      {Array.from({ length: 12 }).map((_, i) => (
-        <div
-          key={i}
-          className="h-16 rounded-xl border border-stone-200/60 bg-stone-100 dark:border-stone-800 dark:bg-stone-900"
-        />
       ))}
     </div>
   );

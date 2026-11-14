@@ -24,6 +24,7 @@ import type { DiscipleshipDay } from "@/types/discipleship";
 import { GuideSection } from "@/components/discipulado/GuideSection";
 import { DayCompletion } from "@/components/discipulado/DayCompletion";
 import { DayNotes } from "@/components/discipulado/DayNotes";
+import { PassageSkeleton } from "@/components/skeletons/DiscipleshipDaySkeleton";
 
 interface DayPageProps {
   params: Promise<{ dia: string }>;
@@ -47,25 +48,6 @@ export async function generateMetadata({
     title: `Día ${day.day}: ${day.title}`,
     description: `Plan de discipulado, día ${day.day} — ${day.reference}.`,
   };
-}
-
-function PassageSkeleton() {
-  return (
-    <div
-      aria-hidden="true"
-      className="flex flex-col gap-4 rounded-3xl border border-stone-200/90 bg-stone-100/50 p-6 animate-pulse sm:p-8 dark:border-stone-800 dark:bg-stone-900/40"
-    >
-      <div className="h-6 w-32 rounded-full bg-stone-200 dark:bg-stone-800" />
-      <div className="space-y-3">
-        {Array.from({ length: 6 }).map((_, index) => (
-          <div
-            key={index}
-            className="h-5 w-full rounded bg-stone-200 dark:bg-stone-800"
-          />
-        ))}
-      </div>
-    </div>
-  );
 }
 
 async function DayPassage({ day }: { day: DiscipleshipDay }) {
