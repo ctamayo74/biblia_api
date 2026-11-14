@@ -19,7 +19,7 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
 | **9** | 2026-11-14 | Implementación de portada (`/`) con versículo diario | `src/data/verses.ts`, `src/lib/daily.ts`, `VerseCard`, `ShareButton` y PPR | `0af818f` |
 | **10** | 2026-11-14 | Módulo de lectura `/leer` con libros, capítulos y visor | `/leer`, `/leer/[bookId]`, `/leer/[bookId]/[chapterId]`, `VersionSelector`, `FontSizeControl` | `5c6d90c` |
 | **11** | 2026-11-14 | Política de documentación previa de cada pedido | Bitácora actualizada al inicio de cada solicitud | `ecd84b2` |
-| **12** | 2026-11-14 | Módulo de memorización con modos, niveles y racha | `/memorizar`, `MemorizationPractice`, ejercicios por modo, `useMemorizationProgress` | *Pendiente de commit* |
+| **12** | 2026-11-14 | Módulo de memorización con modos, niveles y racha | `/memorizar`, `MemorizationPractice`, ejercicios por modo, `useMemorizationProgress` | `cef8c11` |
 
 ---
 
@@ -213,3 +213,4 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
   - Página [`src/app/memorizar/page.tsx`](../src/app/memorizar/page.tsx) como Server Component con `await searchParams`, lectura de `?ref=`, fallback al versículo del día ante referencias inválidas y `Suspense` para PPR.
   - Verificación: `npm run build` OK (`◐ /memorizar` Partial Prerender) y prueba real con `next start` (`?ref=PHP.4.13` y ref inválida).
 * **Archivos clave**: `src/types/memorization.ts`, `src/lib/memorization.ts`, `src/hooks/useMemorizationProgress.ts`, `src/hooks/useMemorizationPreferences.ts`, `src/components/memorizar/*`, `src/app/memorizar/page.tsx`.
+* **Commit**: `cef8c11` (`feat(memorizar): agrega práctica de memorización con modos, niveles y racha en localStorage`).
