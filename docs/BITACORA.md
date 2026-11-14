@@ -24,7 +24,7 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
 | **14** | 2026-11-14 | Guía de evangelismo paso a paso (`/evangelizar`) | `src/data/evangelio.ts`, `StepNavigator`, recorrido de 6 pasos con oración | `9f06b10` |
 | **15** | 2026-11-14 | Plan de discipulado de 7 días (`/discipulado`) | `plan-discipulado.ts`, `DayCheckbox`, progreso y notas en localStorage | `59c8f9b` |
 | **16** | 2026-11-14 | Búsqueda de la Biblia (`/buscar`) | `SearchForm` con debounce y `AbortController`, enlace en la navegación | `ea89498` |
-| **17** | 2026-11-14 | Estados de carga y error con convenciones de App Router | `loading.tsx`, `error.tsx`, `not-found.tsx` y `global-error.tsx` | *Pendiente de commit* |
+| **17** | 2026-11-14 | Estados de carga y error con convenciones de App Router | `loading.tsx`, `error.tsx`, `not-found.tsx` y `global-error.tsx` | `27d711b` |
 
 ---
 
@@ -334,3 +334,4 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
       - **`/evangelizar`**: por diseño usa `Promise.allSettled`, de modo que **degrada con gracia** (muestra los pasos con el texto vacío) en vez de lanzar; su `error.tsx` queda como red de seguridad ante errores de render inesperados.
     - **Restauración**: `BIBLE_API_KEY` se restauró desde el respaldo y se volvió a vaciar `.next/cache`; se confirmó que la UI de error desaparece y todas las rutas vuelven a renderizar con normalidad.
 * **Archivos clave**: `src/components/skeletons/*`, `src/components/errors/ErrorState.tsx`, `src/app/loading.tsx`, `src/app/error.tsx`, `src/app/global-error.tsx`, `src/app/not-found.tsx`, `src/app/leer/**/loading.tsx`, `src/app/leer/**/error.tsx`, `src/app/evangelizar/{loading,error}.tsx`, `src/app/discipulado/[dia]/{loading,error}.tsx`, `src/app/memorizar/error.tsx`, `src/app/buscar/error.tsx`.
+* **Commit**: `27d711b` (`feat(estados): loading, error, not-found y global-error con skeletons reutilizables`).
