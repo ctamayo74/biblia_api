@@ -1,12 +1,117 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Brain } from "lucide-react";
+import { connection } from "next/server";
+import { getVerse } from "@/lib/bible";
+import { getDailyVerseReference } from "@/lib/daily";
+import { MemorizationPractice } from "@/components/memorizar/MemorizationPractice";
+import type { PracticeVerse } from "@/types/memorization";
 
 export const metadata: Metadata = {
   title: "Memorizar Versículos",
-  description: "Entrena tu memoria y guarda la Palabra de Dios en tu corazón mediante ejercicios diarios.",
+  description:
+    "Entrena tu memoria y guarda la Palabra de Dios en tu corazón con ejercicios por modos y niveles.",
 };
 
-export default function MemorizarPage() {
+const DEFAULT_BIBLE_ID = process.env.BIBLE_DEFAULT_ID || "826f63861180e056-01";
+
+/**
+ * Carga el versículo solicitado; si la referencia no es válida,
+ * reintenta con el versículo del día como respaldo.
+ */
+async function loadPracticeVerse(
+  bibleId: string,
+  verseId: string
+): Promise<PracticeVerse> {
+  const fallbackId = getDailyVerseReference().id;
+
+  try {
+    const verse = await getVerse(bibleId, verseId);
+    return { id: verse.id, reference: verse.reference, content: verse.content };
+  } catch (error) {
+    if (verseId === fallbackId) {
+      throw error;
+    }
+
+    const fallbackVerse = await getVerse(bibleId, fallbackId);
+    return {
+      id: fallbackVerse.id,
+      reference: fallbackVerse.reference,
+      content: fallbackVerse.content,
+    };
+  }
+}
+
+type LoadResult =
+  | { ok: true; verse: PracticeVerse }
+  | { ok: false; message: string };
+
+/** Resuelve el versículo inicial sin lanzar errores hacia el render. */
+async function resolveInitialVerse(
+  bibleId: string,
+  verseId: string
+): Promise<LoadResult> {
+  try {
+    return { ok: true, verse: await loadPracticeVerse(bibleId, verseId) };
+  } catch (error) {
+    return {
+      ok: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "No se pudo cargar el versículo para practicar.",
+    };
+  }
+}
+
+async function MemorizationSection({
+  searchParams,
+}: {
+  searchParams: Promise<{ ref?: string }>;
+}) {
+  await connection();
+  const { ref } = await searchParams;
+  const bibleId = DEFAULT_BIBLE_ID;
+  const verseId = ref?.trim() || getDailyVerseReference().id;
+  const result = await resolveInitialVerse(bibleId, verseId);
+
+  if (!result.ok) {
+    return (
+      <div
+        role="alert"
+        className="rounded-2xl border border-rose-200 bg-rose-50 p-5 text-sm text-rose-800 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-300"
+      >
+        <p className="font-semibold">No pudimos cargar el versículo.</p>
+        <p className="mt-1">{result.message}</p>
+      </div>
+    );
+  }
+
+  return <MemorizationPractice initialVerse={result.verse} bibleId={bibleId} />;
+}
+
+function MemorizationSkeleton() {
+  return (
+    <div aria-hidden="true" className="flex flex-col gap-6 animate-pulse">
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <div
+            key={index}
+            className="h-24 rounded-2xl bg-stone-200 dark:bg-stone-800"
+          />
+        ))}
+      </div>
+      <div className="h-11 w-full rounded-xl bg-stone-200 dark:bg-stone-800" />
+      <div className="h-72 rounded-3xl bg-stone-200 dark:bg-stone-800" />
+    </div>
+  );
+}
+
+export default function MemorizarPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ ref?: string }>;
+}) {
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6 sm:px-6 sm:py-10">
       <header className="border-b border-stone-200 pb-4 dark:border-stone-800">
@@ -19,22 +124,15 @@ export default function MemorizarPage() {
               Memorizar
             </h1>
             <p className="text-sm text-stone-500 dark:text-stone-400">
-              Retén la Escritura mediante prácticas interactivas y dinámicas.
+              Retén la Escritura con modos, niveles y una racha diaria.
             </p>
           </div>
         </div>
       </header>
 
-      {/* Placeholder temporal */}
-      <section className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-stone-300 p-8 text-center sm:p-12 dark:border-stone-800">
-        <Brain className="h-10 w-10 text-stone-400 dark:text-stone-600" aria-hidden="true" />
-        <h2 className="mt-3 text-base font-semibold text-stone-800 dark:text-stone-200">
-          Módulo de Memorización en Construcción
-        </h2>
-        <p className="mt-1 max-w-sm text-sm text-stone-500 dark:text-stone-400">
-          Aquí podrás practicar la memorización del versículo diario con la dinámica de ocultar palabras progresivamente.
-        </p>
-      </section>
+      <Suspense fallback={<MemorizationSkeleton />}>
+        <MemorizationSection searchParams={searchParams} />
+      </Suspense>
     </div>
   );
 }

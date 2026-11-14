@@ -19,6 +19,7 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
 | **9** | 2026-11-14 | Implementación de portada (`/`) con versículo diario | `src/data/verses.ts`, `src/lib/daily.ts`, `VerseCard`, `ShareButton` y PPR | `0af818f` |
 | **10** | 2026-11-14 | Módulo de lectura `/leer` con libros, capítulos y visor | `/leer`, `/leer/[bookId]`, `/leer/[bookId]/[chapterId]`, `VersionSelector`, `FontSizeControl` | `5c6d90c` |
 | **11** | 2026-11-14 | Política de documentación previa de cada pedido | Bitácora actualizada al inicio de cada solicitud | `ecd84b2` |
+| **12** | 2026-11-14 | Módulo de memorización con modos, niveles y racha | `/memorizar`, `MemorizationPractice`, ejercicios por modo, `useMemorizationProgress` | *Pendiente de commit* |
 
 ---
 
@@ -188,3 +189,27 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
   - Alta de esta política como procedimiento permanente del proyecto: cada nueva solicitud se registra primero (índice + detalle) y luego se ejecuta.
   - Registro del estado *Pendiente de commit* hasta cerrar cada pedido con su commit convencional.
 * **Archivos clave**: `docs/BITACORA.md`.
+
+---
+
+### Pedido 12: Módulo de Memorización con Modos, Niveles y Racha
+* **Solicitud**: Implementar el módulo `/memorizar` con práctica interactiva de memorización, incluyendo varios **modos** de ejercicios, **niveles** de dificultad y una **racha** de constancia persistida en `localStorage`. Commit final: `feat(memorizar): agrega práctica de memorización con modos, niveles y racha en localStorage`.
+* **Alcance acordado**:
+  1. Tres modos: **Completar** (palabras ocultas), **Ordenar** (reconstruir la frase) y **Escribir** (de memoria).
+  2. Cuatro niveles de dificultad (Fácil, Intermedio, Difícil, Maestría) que ajustan la ayuda de cada modo.
+  3. Racha diaria, mejor racha, sesiones y versículos dominados en `localStorage`.
+  4. Selector de versículo desde la lista curada y desde `?ref=` (deep link del inicio).
+  5. Server Component que resuelve el versículo y Client Component para la práctica.
+* **Acciones ejecutadas**:
+  - Tipos en [`src/types/memorization.ts`](../src/types/memorization.ts): `MemorizationMode`, `MemorizationLevelValue`, `MemorizationLevelInfo`, `MemorizationProgress`, `PracticeVerse`.
+  - Lógica pura en [`src/lib/memorization.ts`](../src/lib/memorization.ts): catálogos de modos y niveles, tokenización y normalización de texto, aleatoriedad determinista con semilla, ocultamiento de palabras, ordenamiento (`shuffleWords`) y cálculo de racha (`registerPractice`) con validación de datos de `localStorage`.
+  - Hooks de cliente: [`useMemorizationProgress.ts`](../src/hooks/useMemorizationProgress.ts) (racha, mejor racha, sesiones y versículos logrados en `biblia_memorizar_progreso`) y [`useMemorizationPreferences.ts`](../src/hooks/useMemorizationPreferences.ts) (modo y nivel en `biblia_memorizar_preferencias`).
+  - Componentes en [`src/components/memorizar/`](../src/components/memorizar/):
+    - `MemorizationStreak.tsx`: racha, mejor racha y versículos logrados.
+    - `MemorizationModeSelector.tsx` y `MemorizationLevelSelector.tsx`: selección accesible de modo y nivel.
+    - `VersePicker.tsx`: selector de versículo desde la lista curada (agrupado por categoría).
+    - `FillBlanksExercise.tsx` (modo Completar), `OrderWordsExercise.tsx` (modo Ordenar) y `TypeVerseExercise.tsx` (modo Escribir).
+    - `MemorizationPractice.tsx`: orquestador con cambio de versículo vía `/api/verse`, celebración y "Siguiente versículo".
+  - Página [`src/app/memorizar/page.tsx`](../src/app/memorizar/page.tsx) como Server Component con `await searchParams`, lectura de `?ref=`, fallback al versículo del día ante referencias inválidas y `Suspense` para PPR.
+  - Verificación: `npm run build` OK (`◐ /memorizar` Partial Prerender) y prueba real con `next start` (`?ref=PHP.4.13` y ref inválida).
+* **Archivos clave**: `src/types/memorization.ts`, `src/lib/memorization.ts`, `src/hooks/useMemorizationProgress.ts`, `src/hooks/useMemorizationPreferences.ts`, `src/components/memorizar/*`, `src/app/memorizar/page.tsx`.
