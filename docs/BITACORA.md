@@ -15,7 +15,8 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
 | **5** | 2026-11-14 | Commit convencional de configuración inicial | Commit formal de setup y reglas del proyecto | `f3017a7` |
 | **6** | 2026-11-14 | Registro continuo de pedidos | Bitácora viva en `docs/BITACORA.md` | `24eeb7a` |
 | **7** | 2026-11-14 | Capa de acceso a API.Bible y Route Handlers proxy | Tipos en `src/types/bible.ts`, cliente servidor en `src/lib/bible.ts` y 5 Route Handlers | `c12cd87` |
-| **8** | 2026-11-14 | Layout global, navegación móvil/escritorio y rutas base | `Header`, `BottomNav`, `Footer`, fuentes serif/sans y 5 rutas | `0c0fefd` |
+| **8** | 2026-11-14 | Layout global, navegación móvil/escritorio y rutas base | `Header`, `BottomNav`, `Footer`, fuentes serif/sans y 5 rutas | `4eb2735` |
+| **9** | 2026-11-14 | Implementación de portada (`/`) con versículo diario | `src/data/verses.ts`, `src/lib/daily.ts`, `VerseCard`, `ShareButton` y PPR | `f96c841` |
 
 ---
 
@@ -132,4 +133,23 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
   - Creación/actualización de las 5 páginas: [`src/app/page.tsx`](../src/app/page.tsx), [`src/app/leer/page.tsx`](../src/app/leer/page.tsx), [`src/app/memorizar/page.tsx`](../src/app/memorizar/page.tsx), [`src/app/evangelizar/page.tsx`](../src/app/evangelizar/page.tsx) y [`src/app/discipulado/page.tsx`](../src/app/discipulado/page.tsx).
   - Verificación exitosa de compilación con Turbopack (`14/14` páginas generadas sin errores).
 * **Archivos clave**: `src/app/layout.tsx`, `src/app/globals.css`, `src/components/{Header,BottomNav,Footer}.tsx`, `src/app/{page,leer,memorizar,evangelizar,discipulado}/page.tsx`.
-* **Commit**: `0c0fefd` (`feat(ui): agrega layout responsive, navegación y rutas base`).
+* **Commit**: `4eb2735` (`feat(ui): agrega layout responsive, navegación y rutas base`).
+
+---
+
+### Pedido 9: Portada Principal con Versículo Diario y Módulos de Acceso Rápido
+* **Solicitud**:
+  1. `src/data/verses.ts`: Lista curada de 60 referencias bíblicas en formato API.Bible con categorías (`evangelio`, `crecimiento`, `memorizar`).
+  2. `src/lib/daily.ts`: Algoritmo determinista para seleccionar el versículo diario según el día del año (mismo versículo para todos los usuarios).
+  3. `src/app/page.tsx` (Server Component): Consultar versículo con `getVerse()` de `src/lib/bible.ts` y presentarlo en `VerseCard` con texto legible, referencia, botón "Compartir" y enlace "Memorizar este versículo" (`/memorizar?ref=...`).
+  4. Tres tarjetas de acceso rápido debajo: Evangelizar, Discipulado y Memorizar.
+  5. Separación limpia: `VerseCard` como Server Component y `ShareButton` como Client Component (`navigator.share` con fallback a portapapeles).
+* **Acciones ejecutadas**:
+  - Creación de [`src/data/verses.ts`](../src/data/verses.ts) con 60 versículos curados clasificados y tipados estrictamente.
+  - Creación de [`src/lib/daily.ts`](../src/lib/daily.ts) con función matemática determinista basada en el día ordinal del año en UTC.
+  - Creación de [`src/components/ShareButton.tsx`](../src/components/ShareButton.tsx) (Client Component) con soporte para Web Share API, fallback a `navigator.clipboard` y feedback táctil accesible.
+  - Creación de [`src/components/VerseCard.tsx`](../src/components/VerseCard.tsx) (Server Component) con tipografía editorial `Lora`, badges temáticos y enlaces accesibles.
+  - Actualización de [`src/app/page.tsx`](../src/app/page.tsx) con arquitectura de **Partial Prerendering (PPR)** de Next.js 16 (`<Suspense fallback={<VerseCardSkeleton />}>`), garantizando renderizado instantáneo del cascarón estático y streaming del versículo dinámico.
+  - Verificación exitosa de compilación (`Route (app): ◐ / (Partial Prerender)`).
+* **Archivos clave**: `src/data/verses.ts`, `src/lib/daily.ts`, `src/components/ShareButton.tsx`, `src/components/VerseCard.tsx`, `src/app/page.tsx`.
+* **Commit**: `f96c841` (`feat(home): muestra versículo del día con Server Component y botón compartir`).
