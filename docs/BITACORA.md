@@ -22,6 +22,7 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
 | **12** | 2026-11-14 | Módulo de memorización con modos, niveles y racha | `/memorizar`, `MemorizationPractice`, ejercicios por modo, `useMemorizationProgress` | `cef8c11` |
 | **13** | 2026-11-14 | Re-especificación de `/memorizar` (lista, dominio 0-3, hook SSR) | `useLocalStorage`, `VerseList`, `PracticeCard`, `StreakBadge`, `AddVerseForm` | `bd2554b` |
 | **14** | 2026-11-14 | Guía de evangelismo paso a paso (`/evangelizar`) | `src/data/evangelio.ts`, `StepNavigator`, recorrido de 6 pasos con oración | `9f06b10` |
+| **15** | 2026-11-14 | Plan de discipulado de 7 días (`/discipulado`) | `plan-discipulado.ts`, `DayCheckbox`, progreso y notas en localStorage | *Pendiente de commit* |
 
 ---
 
@@ -261,3 +262,24 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
   - Verificación: `npm run build` OK (`◐ /evangelizar` Partial Prerender), smoke test con `next start` (HTTP 200 con los 6 pasajes, referencias, "Paso 1 de 6" y "Compartir este paso" en el HTML; el cierre en el bundle cliente) y `npm run lint` sin hallazgos nuevos.
 * **Archivos clave**: `src/data/evangelio.ts`, `src/types/evangelism.ts`, `src/components/evangelizar/*`, `src/app/evangelizar/page.tsx`, `src/components/ShareButton.tsx`.
 * **Commit**: `9f06b10` (`feat(evangelizar): guia paso a paso para compartir el evangelio con oracion y siguientes pasos`).
+
+---
+
+### Pedido 15: Plan de Discipulado de 7 Días (`/discipulado`)
+* **Solicitud**: Implementar `/discipulado` como un plan de 7 días para nuevos creyentes:
+  1. `src/data/plan-discipulado.ts`: **7 días** con título, pasaje de lectura (ej. Juan 1, Marcos 1, Romanos 8), una **pregunta de reflexión**, una **oración corta** y una **acción práctica**.
+  2. La página lista los 7 días con su progreso; `/discipulado/[dia]` (con `await params`) muestra el pasaje (`getPassage`), la reflexión, la oración y la acción.
+  3. Client Component `DayCheckbox` que marca el día como completado, persistido en `localStorage` con el hook `useLocalStorage`, y una **barra de progreso global**.
+  4. Campo de **notas personales por día** guardadas en `localStorage` (`useState` + `useEffect`).
+  5. Validación del parámetro `dia`: si no está entre 1 y 7, usa `notFound()`.
+* **Acciones ejecutadas**:
+  - Plan en [`src/data/plan-discipulado.ts`](../src/data/plan-discipulado.ts): 7 días tipados (`DISCIPLESHIP_PLAN`) con título, pasaje (Juan 1, Marcos 1, Romanos 8, Salmos 23, Mateo 6, Santiago 1, Hechos 2), reflexión, oración y acción práctica; más `DISCIPLESHIP_TOTAL_DAYS` y `getDiscipleshipDay()`.
+  - Tipos en [`src/types/discipleship.ts`](../src/types/discipleship.ts): `DiscipleshipDay` y `DiscipleshipProgressStore`.
+  - Progreso en [`src/hooks/useDiscipleshipProgress.ts`](../src/hooks/useDiscipleshipProgress.ts): envuelve el hook `useLocalStorage` (clave `palabra-diaria:discipulado`), sanea datos con `parse`, y expone `isCompleted`, `toggleDay`, `completedCount`, `percent` e `isLoaded`.
+  - Componentes en [`src/components/discipulado/`](../src/components/discipulado/): `DayCheckbox` (control accesible `role="checkbox"`), `ProgressBar` (barra global con contador), `DiscipleshipPlan` (lista de los 7 días con progreso), `DayCompletion` (marca de completado del día con el hook), `DayNotes` (notas por día con `useState` + `useEffect` y guardado automático en `palabra-diaria:discipulado:notas`) y `GuideSection` (tarjetas de reflexión, oración y acción).
+  - Páginas: [`src/app/discipulado/page.tsx`](../src/app/discipulado/page.tsx) (Server Component con encabezado + `DiscipleshipPlan`) y [`src/app/discipulado/[dia]/page.tsx`](../src/app/discipulado/[dia]/page.tsx) con `await params`, `generateStaticParams` (días 1-7), `generateMetadata`, `getPassage` en un componente dentro de `Suspense` (PPR), `notFound()` si el día no está entre 1 y 7, y navegación anterior/siguiente.
+  - **Validación**: `getDiscipleshipDay(Number(dia))` devuelve `undefined` fuera de 1-7 (incluye `abc`, `3.5`, `0`, `8`) y se llama `notFound()`.
+  - **Nota sobre el estado HTTP**: con `cacheComponents` activado, el `notFound()` en tiempo de petición se ejecuta tras enviarse el shell, por lo que la respuesta conserva `200` con la UI 404 y `<meta name="robots" content="noindex">` (comportamiento documentado en Next 16; un 404 real exigiría comprobarlo en el Proxy).
+  - Verificación: `npm run build` OK (`○ /discipulado` estático y `◐ /discipulado/[dia]` PPR con los 7 días prerenderizados), smoke test con `next start` (lista con títulos y progreso; detalle con pasaje, reflexión, oración, acción y notas; `/discipulado/99` muestra la UI 404 + `noindex`) y `npm run lint` sin hallazgos nuevos.
+* **Archivos clave**: `src/data/plan-discipulado.ts`, `src/types/discipleship.ts`, `src/hooks/useDiscipleshipProgress.ts`, `src/components/discipulado/*`, `src/app/discipulado/page.tsx`, `src/app/discipulado/[dia]/page.tsx`.
+* **Commit**: *(pendiente)*

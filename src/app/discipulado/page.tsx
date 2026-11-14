@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Sprout } from "lucide-react";
+import { DiscipleshipPlan } from "@/components/discipulado/DiscipleshipPlan";
 
 export const metadata: Metadata = {
   title: "Discipulado",
-  description: "Lecciones y fundamentos prácticos para crecer en la fe y conocimiento de Dios.",
+  description:
+    "Plan de 7 días para nuevos creyentes: lectura bíblica, reflexión, oración y una acción práctica cada día.",
 };
 
 export default function DiscipuladoPage() {
@@ -11,7 +13,7 @@ export default function DiscipuladoPage() {
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6 sm:px-6 sm:py-10">
       <header className="border-b border-stone-200 pb-4 dark:border-stone-800">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-400">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400">
             <Sprout className="h-5 w-5" aria-hidden="true" />
           </div>
           <div>
@@ -19,22 +21,19 @@ export default function DiscipuladoPage() {
               Discipulado
             </h1>
             <p className="text-sm text-stone-500 dark:text-stone-400">
-              Crecimiento espiritual paso a paso para la vida diaria.
+              Un plan de 7 días para empezar a caminar con Jesús.
             </p>
           </div>
         </div>
       </header>
 
-      {/* Placeholder temporal */}
-      <section className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-stone-300 p-8 text-center sm:p-12 dark:border-stone-800">
-        <Sprout className="h-10 w-10 text-stone-400 dark:text-stone-600" aria-hidden="true" />
-        <h2 className="mt-3 text-base font-semibold text-stone-800 dark:text-stone-200">
-          Módulo de Discipulado en Construcción
-        </h2>
-        <p className="mt-1 max-w-sm text-sm text-stone-500 dark:text-stone-400">
-          Aquí encontrarás lecciones cortas con pasajes bíblicos incrustados y preguntas de aplicación práctica.
-        </p>
-      </section>
+      <p className="text-sm leading-relaxed text-stone-600 sm:text-base dark:text-stone-400">
+        Cada día incluye un pasaje para leer, una pregunta para reflexionar, una
+        oración corta y una acción práctica. Ve a tu ritmo y marca los días que
+        completes.
+      </p>
+
+      <DiscipleshipPlan />
     </div>
   );
 }
