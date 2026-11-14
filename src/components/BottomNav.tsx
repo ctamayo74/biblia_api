@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, BookOpen, Brain, Share2, Sprout } from "lucide-react";
+import { Home, BookOpen, Search, Brain, Share2, Sprout } from "lucide-react";
 
 interface BottomNavItem {
   href: string;
@@ -13,6 +13,7 @@ interface BottomNavItem {
 const BOTTOM_NAV_ITEMS: BottomNavItem[] = [
   { href: "/", label: "Inicio", icon: Home },
   { href: "/leer", label: "Leer", icon: BookOpen },
+  { href: "/buscar", label: "Buscar", icon: Search },
   { href: "/memorizar", label: "Memorizar", icon: Brain },
   { href: "/evangelizar", label: "Evangelizar", icon: Share2 },
   { href: "/discipulado", label: "Discipulado", icon: Sprout },

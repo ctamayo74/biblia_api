@@ -23,6 +23,7 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
 | **13** | 2026-11-14 | Re-especificación de `/memorizar` (lista, dominio 0-3, hook SSR) | `useLocalStorage`, `VerseList`, `PracticeCard`, `StreakBadge`, `AddVerseForm` | `bd2554b` |
 | **14** | 2026-11-14 | Guía de evangelismo paso a paso (`/evangelizar`) | `src/data/evangelio.ts`, `StepNavigator`, recorrido de 6 pasos con oración | `9f06b10` |
 | **15** | 2026-11-14 | Plan de discipulado de 7 días (`/discipulado`) | `plan-discipulado.ts`, `DayCheckbox`, progreso y notas en localStorage | `59c8f9b` |
+| **16** | 2026-11-14 | Búsqueda de la Biblia (`/buscar`) | `SearchForm` con debounce y `AbortController`, enlace en la navegación | *Pendiente de commit* |
 
 ---
 
@@ -283,3 +284,22 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
   - Verificación: `npm run build` OK (`○ /discipulado` estático y `◐ /discipulado/[dia]` PPR con los 7 días prerenderizados), smoke test con `next start` (lista con títulos y progreso; detalle con pasaje, reflexión, oración, acción y notas; `/discipulado/99` muestra la UI 404 + `noindex`) y `npm run lint` sin hallazgos nuevos.
 * **Archivos clave**: `src/data/plan-discipulado.ts`, `src/types/discipleship.ts`, `src/hooks/useDiscipleshipProgress.ts`, `src/components/discipulado/*`, `src/app/discipulado/page.tsx`, `src/app/discipulado/[dia]/page.tsx`.
 * **Commit**: `59c8f9b` (`feat(discipulado): plan de 7 dias con progreso, notas y detalle por dia`).
+
+---
+
+### Pedido 16: Búsqueda de la Biblia (`/buscar`)
+* **Solicitud**: Agregar la ruta `/buscar`:
+  1. Formulario Client Component con `useState` y **debounce de 400 ms** que llama a `/api/search`.
+  2. Resultados con referencia y fragmento de texto, con estado **"buscando…"**, estado **vacío** y estado de **error**.
+  3. Cada resultado enlaza al capítulo correspondiente en `/leer` y tiene un botón **"Memorizar"**.
+  4. Cancelar las peticiones anteriores con **`AbortController` dentro de `useEffect`**.
+  5. Agregar el enlace en la navegación.
+* **Acciones ejecutadas**:
+  - Página [`src/app/buscar/page.tsx`](../src/app/buscar/page.tsx): Server Component con `metadata` (título "Buscar"), encabezado con icono `Search` y `<SearchForm bibleId={...} />` usando `BIBLE_DEFAULT_ID`.
+  - Formulario en [`src/components/buscar/SearchForm.tsx`](../src/components/buscar/SearchForm.tsx) (Client Component): `useState` para consulta, resultados, estado y error; **debounce de 400 ms** con `setTimeout`; **`AbortController` creado dentro del `useEffect`** y abortado en la limpieza para cancelar peticiones anteriores; estados `idle`, `loading` ("Buscando…"), `success`, `empty` ("Sin resultados para «…»") y `error` (con mensaje y `role="alert"`); `aria-live="polite"` y `aria-busy`.
+  - Resultado en [`src/components/buscar/SearchResultItem.tsx`](../src/components/buscar/SearchResultItem.tsx) (presentacional): enlace principal al capítulo `/leer/{bookId}/{chapterId}` con referencia y fragmento (`line-clamp-3`), más acciones hermanas "Leer capítulo" y **"Memorizar"** (`/memorizar?ref={id}`), sin elementos interactivos anidados.
+  - Navegación: se agregó **Buscar** a `NAV_ITEMS` en [`src/components/Header.tsx`](../src/components/Header.tsx) (escritorio, tras "Leer") y a `BOTTOM_NAV_ITEMS` en [`src/components/BottomNav.tsx`](../src/components/BottomNav.tsx) (móvil, con icono `Search`).
+  - **Reutilización**: el botón "Memorizar" aprovecha que [`MemorizationTool`](../src/components/memorizar/MemorizationTool.tsx) ya procesa el parámetro `?ref=` (normaliza, valida y agrega el versículo).
+  - Verificación: `npm run build` OK (`○ /buscar` estático); smoke test con `next start`: `/buscar` responde `200` con el formulario, la navegación incluye `href="/buscar"`, `/api/search?q=esperanza` devuelve 10 versículos (total 290), `/api/search` sin `q` responde `400` con mensaje en español, `/leer/PSA/PSA.119` carga el capítulo y `npm run lint` sin hallazgos nuevos (se retiró un `eslint-disable` innecesario en `SearchForm`).
+* **Archivos clave**: `src/app/buscar/page.tsx`, `src/components/buscar/*`, `src/components/Header.tsx`, `src/components/BottomNav.tsx`.
+* **Commit**: *(pendiente)*

@@ -7,6 +7,7 @@ import { BookOpen } from "lucide-react";
 const NAV_ITEMS = [
   { href: "/", label: "Inicio" },
   { href: "/leer", label: "Leer" },
+  { href: "/buscar", label: "Buscar" },
   { href: "/memorizar", label: "Memorizar" },
   { href: "/evangelizar", label: "Evangelizar" },
   { href: "/discipulado", label: "Discipulado" },
