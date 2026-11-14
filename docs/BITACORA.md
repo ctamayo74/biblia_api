@@ -13,7 +13,8 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
 | **3** | 2026-11-14 | Inicialización y verificación de Git | Verificación del repositorio y primer commit de docs | `4d1b3cb` |
 | **4** | 2026-11-14 | Reglas de agentes, entorno, limpieza y estructura | `AGENTS.md`, `.env.local.example`, estructura de carpetas y build verificado | `f3017a7` |
 | **5** | 2026-11-14 | Commit convencional de configuración inicial | Commit formal de setup y reglas del proyecto | `f3017a7` |
-| **6** | 2026-11-14 | Registro continuo de pedidos | Bitácora viva en `docs/BITACORA.md` | *En curso* |
+| **6** | 2026-11-14 | Registro continuo de pedidos | Bitácora viva en `docs/BITACORA.md` | `24eeb7a` |
+| **7** | 2026-11-14 | Capa de acceso a API.Bible y Route Handlers proxy | Tipos en `src/types/bible.ts`, cliente servidor en `src/lib/bible.ts` y 5 Route Handlers | `b7c24a2` |
 
 ---
 
@@ -85,3 +86,26 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
 * **Acciones ejecutadas**:
   - Creación de esta bitácora centralizada en [`docs/BITACORA.md`](docs/BITACORA.md).
   - Compromiso de actualización automática tras cada nuevo requerimiento del usuario.
+* **Commit**: `24eeb7a` (`docs: agregar bitacora de pedidos y desarrollo`).
+
+---
+
+### Pedido 7: Capa de Acceso a API.Bible y Route Handlers Proxy
+* **Solicitud**:
+  1. `src/types/bible.ts`: Tipos TypeScript sin `any` para Bible, Book, Chapter, Verse, Passage y SearchResult.
+  2. `src/lib/bible.ts`: Cliente exclusivo de servidor (`server-only`) con funciones tipadas `getBibles`, `getBooks`, `getChapter`, `getPassage`, `getVerse` y `searchBible`. Manejo de headers `api-key`, variables de entorno y parámetros de limpieza de texto (`content-type=text`, `include-verse-numbers=false`).
+  3. Route Handlers en App Router como proxy interno (`GET /api/bibles`, `GET /api/books`, `GET /api/passage`, `GET /api/verse`, `GET /api/search`, y `/api/chapter`) validando parámetros y retornando formato uniforme `{ data }` o `{ error }` con códigos 400, 502 y 500.
+  4. Mantener la UI intacta y documentar instrucciones de prueba con `curl`.
+* **Acciones ejecutadas**:
+  - Instalación del paquete `server-only`.
+  - Creación de [`src/types/bible.ts`](../src/types/bible.ts) con tipado completo y sin `any`.
+  - Creación de [`src/lib/bible.ts`](../src/lib/bible.ts) con `import "server-only"`, validaciones de variables de entorno y cacheo HTTP.
+  - Creación de los Route Handlers proxy en `src/app/api/{bibles,books,passage,verse,search,chapter}/route.ts`.
+  - Verificación exitosa de compilación con `npm run build` (Turbopack y comprobación de tipos OK).
+* **Archivos clave**: `src/types/bible.ts`, `src/lib/bible.ts`, `src/app/api/**/route.ts`, `package.json`.
+* **Corrección técnica (Fix)**:
+  - Detección de error 404 por tipografía en `.env.local` (`/v.1` con punto en lugar de `/v1`).
+  - Remoción de espacio en blanco inicial en la clave `BIBLE_API_KEY`.
+  - Robustecimiento en [`src/lib/bible.ts`](../src/lib/bible.ts) con sanitización automática (`trim()` y normalización de URL).
+  - Verificación exitosa de conexión directa con API.Bible y respuesta de la versión NTV (`826f63861180e056-01`).
+* **Commit**: `b7c24a2` (`feat(api): agrega servicio de API.Bible y route handlers proxy`).
