@@ -18,7 +18,7 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
 | **8** | 2026-11-14 | Layout global, navegación móvil/escritorio y rutas base | `Header`, `BottomNav`, `Footer`, fuentes serif/sans y 5 rutas | `4eb2735` |
 | **9** | 2026-11-14 | Implementación de portada (`/`) con versículo diario | `src/data/verses.ts`, `src/lib/daily.ts`, `VerseCard`, `ShareButton` y PPR | `0af818f` |
 | **10** | 2026-11-14 | Módulo de lectura `/leer` con libros, capítulos y visor | `/leer`, `/leer/[bookId]`, `/leer/[bookId]/[chapterId]`, `VersionSelector`, `FontSizeControl` | `5c6d90c` |
-| **11** | 2026-11-14 | Política de documentación previa de cada pedido | Bitácora actualizada al inicio de cada solicitud | `089581b` |
+| **11** | 2026-11-14 | Política de documentación previa de cada pedido | Bitácora actualizada al inicio de cada solicitud | `ecd84b2` |
 
 ---
 
