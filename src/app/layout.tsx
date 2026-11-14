@@ -1,30 +1,46 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Lora } from "next/font/google";
+import { Header } from "@/components/Header";
+import { BottomNav } from "@/components/BottomNav";
+import { Footer } from "@/components/Footer";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const sansFont = Geist({
+  variable: "--font-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const serifFont = Lora({
+  variable: "--font-serif",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Palabra Diaria - Escritura para cada día",
-  description: "Tu espacio diario para leer, memorizar, evangelizar y crecer en la Palabra de Dios.",
+  title: {
+    default: "Palabra Diaria - Escritura para cada día",
+    template: "%s | Palabra Diaria",
+  },
+  description:
+    "Lectura, memorización y discipulado bíblico diario en español para dispositivos móviles y escritorio.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html
       lang="es"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${sansFont.variable} ${serifFont.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-        {children}
+      <body className="min-h-full flex flex-col bg-stone-50 text-stone-900 selection:bg-amber-200 selection:text-stone-900 dark:bg-stone-950 dark:text-stone-100 dark:selection:bg-amber-950 dark:selection:text-amber-200">
+        <Header />
+        <main className="flex-1 pb-20 md:pb-0">{children}</main>
+        <Footer />
+        <BottomNav />
       </body>
     </html>
   );

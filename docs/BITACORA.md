@@ -14,7 +14,8 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
 | **4** | 2026-11-14 | Reglas de agentes, entorno, limpieza y estructura | `AGENTS.md`, `.env.local.example`, estructura de carpetas y build verificado | `f3017a7` |
 | **5** | 2026-11-14 | Commit convencional de configuración inicial | Commit formal de setup y reglas del proyecto | `f3017a7` |
 | **6** | 2026-11-14 | Registro continuo de pedidos | Bitácora viva en `docs/BITACORA.md` | `24eeb7a` |
-| **7** | 2026-11-14 | Capa de acceso a API.Bible y Route Handlers proxy | Tipos en `src/types/bible.ts`, cliente servidor en `src/lib/bible.ts` y 5 Route Handlers | `b7c24a2` |
+| **7** | 2026-11-14 | Capa de acceso a API.Bible y Route Handlers proxy | Tipos en `src/types/bible.ts`, cliente servidor en `src/lib/bible.ts` y 5 Route Handlers | `c12cd87` |
+| **8** | 2026-11-14 | Layout global, navegación móvil/escritorio y rutas base | `Header`, `BottomNav`, `Footer`, fuentes serif/sans y 5 rutas | `0c0fefd` |
 
 ---
 
@@ -108,4 +109,27 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
   - Remoción de espacio en blanco inicial en la clave `BIBLE_API_KEY`.
   - Robustecimiento en [`src/lib/bible.ts`](../src/lib/bible.ts) con sanitización automática (`trim()` y normalización de URL).
   - Verificación exitosa de conexión directa con API.Bible y respuesta de la versión NTV (`826f63861180e056-01`).
-* **Commit**: `b7c24a2` (`feat(api): agrega servicio de API.Bible y route handlers proxy`).
+* **Commit**: `c12cd87` (`feat(api): agrega servicio de API.Bible y route handlers proxy`).
+
+---
+
+### Pedido 8: Layout Global, Navegación Móvil/Escritorio y Rutas Base
+* **Solicitud**:
+  1. `src/app/layout.tsx`: Metadata en español, `lang="es"`, fuente serif para texto bíblico (`Lora`) y sans para la interfaz (`Geist`) usando `next/font`.
+  2. Componentes:
+     - Header con logo "Palabra Diaria" y navegación de escritorio (Inicio, Leer, Memorizar, Evangelizar, Discipulado).
+     - `BottomNav` fija para móvil con iconos de `lucide-react` y etiquetas.
+     - `Footer` con atribución: *"Texto bíblico obtenido de API.Bible"*.
+  3. Paleta sobria y cálida (`stone` y `amber`), soporte para modo claro/oscuro con clases `dark:`, contraste accesible y áreas táctiles de mínimo 44px.
+  4. Rutas vacías con título y texto temporal: `/`, `/leer`, `/memorizar`, `/evangelizar`, `/discipulado`.
+  5. Diseño responsivo para 375px y escritorio. Respetar `AGENTS.md` y verificar compilación con `npm run build`.
+* **Acciones ejecutadas**:
+  - Instalación de dependencia `lucide-react`.
+  - Configuración tipográfica con `Geist` (sans) y `Lora` (serif) en [`src/app/layout.tsx`](../src/app/layout.tsx) y [`src/app/globals.css`](../src/app/globals.css).
+  - Creación de [`src/components/Header.tsx`](../src/components/Header.tsx) con logo y barra de navegación de escritorio con indicador de ruta activa.
+  - Creación de [`src/components/BottomNav.tsx`](../src/components/BottomNav.tsx) fijo en móvil (`md:hidden`), con navegación táctil (mínimo 44px) e iconos (`Home`, `BookOpen`, `Brain`, `Share2`, `Sprout`).
+  - Creación de [`src/components/Footer.tsx`](../src/components/Footer.tsx) con atribución a API.Bible y padding inferior adaptado a la barra móvil.
+  - Creación/actualización de las 5 páginas: [`src/app/page.tsx`](../src/app/page.tsx), [`src/app/leer/page.tsx`](../src/app/leer/page.tsx), [`src/app/memorizar/page.tsx`](../src/app/memorizar/page.tsx), [`src/app/evangelizar/page.tsx`](../src/app/evangelizar/page.tsx) y [`src/app/discipulado/page.tsx`](../src/app/discipulado/page.tsx).
+  - Verificación exitosa de compilación con Turbopack (`14/14` páginas generadas sin errores).
+* **Archivos clave**: `src/app/layout.tsx`, `src/app/globals.css`, `src/components/{Header,BottomNav,Footer}.tsx`, `src/app/{page,leer,memorizar,evangelizar,discipulado}/page.tsx`.
+* **Commit**: `0c0fefd` (`feat(ui): agrega layout responsive, navegación y rutas base`).

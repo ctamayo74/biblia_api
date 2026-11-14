@@ -1,87 +1,127 @@
 import Link from "next/link";
+import { BookOpen, Brain, Share2, Sprout, Search } from "lucide-react";
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-4 sm:p-8">
-      <div className="w-full max-w-md flex flex-col gap-6">
-        {/* Encabezado */}
-        <header className="text-center pt-4">
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-            Palabra Diaria
-          </h1>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
-            Lectura, memorización y discipulado en tu día a día
-          </p>
-        </header>
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6 sm:px-6 sm:py-10">
+      {/* Encabezado Principal */}
+      <section className="text-center">
+        <span className="text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-400">
+          Escritura Diaria
+        </span>
+        <h1 className="mt-1 font-serif text-2xl font-bold tracking-tight text-stone-900 sm:text-4xl dark:text-stone-100">
+          Palabra Diaria
+        </h1>
+        <p className="mx-auto mt-2 max-w-md text-sm text-stone-600 sm:text-base dark:text-stone-400">
+          Conéctate con la Escritura cada día a través de la lectura, memorización y discipulado.
+        </p>
+      </section>
 
-        {/* Tarjeta del Versículo del Día (Placeholder) */}
-        <section
-          aria-label="Versículo del día"
-          className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-800 dark:bg-zinc-900"
-        >
-          <span className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+      {/* Tarjeta del Versículo Destacado */}
+      <section
+        aria-label="Versículo del día"
+        className="rounded-2xl border border-stone-200/90 bg-stone-100/60 p-6 shadow-xs sm:p-8 dark:border-stone-800 dark:bg-stone-900/60"
+      >
+        <div className="flex items-center justify-between">
+          <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-900 dark:bg-amber-950/80 dark:text-amber-300">
             Versículo de Hoy
           </span>
-          <blockquote className="mt-2 text-base font-medium italic leading-relaxed text-zinc-800 dark:text-zinc-200">
-            &ldquo;Lámpara es a mis pies tu palabra, y lumbrera a mi camino.&rdquo;
-          </blockquote>
-          <p className="mt-3 text-right text-xs font-semibold text-zinc-500 dark:text-zinc-400">
-            Salmos 119:105
-          </p>
-        </section>
+          <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
+            NTV
+          </span>
+        </div>
 
-        {/* Accesos Rápidos */}
-        <nav aria-label="Secciones principales" className="grid grid-cols-2 gap-3">
-          <Link
-            href="/leer"
-            className="flex flex-col gap-1 rounded-xl border border-zinc-200 bg-white p-4 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-600"
-          >
-            <span className="text-xl" role="img" aria-hidden="true">📖</span>
-            <span className="text-sm font-semibold">Leer</span>
-            <span className="text-xs text-zinc-500 dark:text-zinc-400">Libros y capítulos</span>
-          </Link>
+        <blockquote className="mt-4 font-serif text-lg leading-relaxed text-stone-800 sm:text-xl dark:text-stone-200">
+          &ldquo;Tu palabra es una lámpara que guía mis pies y una luz para mi camino.&rdquo;
+        </blockquote>
 
-          <Link
-            href="/memorizar"
-            className="flex flex-col gap-1 rounded-xl border border-zinc-200 bg-white p-4 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-600"
-          >
-            <span className="text-xl" role="img" aria-hidden="true">🧠</span>
-            <span className="text-sm font-semibold">Memorizar</span>
-            <span className="text-xs text-zinc-500 dark:text-zinc-400">Práctica interactiva</span>
-          </Link>
+        <p className="mt-3 text-right text-xs font-semibold text-amber-800 sm:text-sm dark:text-amber-400">
+          Salmos 119:105
+        </p>
+      </section>
 
-          <Link
-            href="/evangelizar"
-            className="flex flex-col gap-1 rounded-xl border border-zinc-200 bg-white p-4 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-600"
-          >
-            <span className="text-xl" role="img" aria-hidden="true">💬</span>
-            <span className="text-sm font-semibold">Evangelizar</span>
-            <span className="text-xs text-zinc-500 dark:text-zinc-400">Tarjetas para compartir</span>
-          </Link>
-
-          <Link
-            href="/discipulado"
-            className="flex flex-col gap-1 rounded-xl border border-zinc-200 bg-white p-4 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-600"
-          >
-            <span className="text-xl" role="img" aria-hidden="true">🌱</span>
-            <span className="text-sm font-semibold">Discipulado</span>
-            <span className="text-xs text-zinc-500 dark:text-zinc-400">Lecciones guiadas</span>
-          </Link>
-        </nav>
-
-        {/* Buscador */}
+      {/* Accesos Rápidos a Módulos */}
+      <section aria-label="Módulos principales" className="grid grid-cols-2 gap-3 sm:gap-4">
         <Link
-          href="/buscar"
-          className="flex items-center justify-between rounded-xl border border-dashed border-zinc-300 p-3 text-sm text-zinc-600 transition-colors hover:border-zinc-400 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500"
+          href="/leer"
+          className="group flex min-h-[44px] flex-col justify-between rounded-xl border border-stone-200/80 bg-white p-4 transition-all hover:border-amber-600/50 hover:shadow-xs dark:border-stone-800 dark:bg-stone-900 dark:hover:border-amber-500/50"
         >
-          <span>🔍 Buscar pasajes o palabras...</span>
-          <span className="text-xs text-zinc-400 dark:text-zinc-500">Ir</span>
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 text-amber-700 transition-colors group-hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-400">
+            <BookOpen className="h-5 w-5" aria-hidden="true" />
+          </div>
+          <div className="mt-4">
+            <h2 className="text-sm font-semibold text-stone-900 dark:text-stone-100">
+              Leer
+            </h2>
+            <p className="mt-0.5 text-xs text-stone-500 dark:text-stone-400">
+              Libros y capítulos completos
+            </p>
+          </div>
         </Link>
-      </div>
 
-      <footer className="mt-8 text-center text-xs text-zinc-400 dark:text-zinc-600">
-        Palabra Diaria • Alimentado por API.Bible
-      </footer>
-    </main>
+        <Link
+          href="/memorizar"
+          className="group flex min-h-[44px] flex-col justify-between rounded-xl border border-stone-200/80 bg-white p-4 transition-all hover:border-amber-600/50 hover:shadow-xs dark:border-stone-800 dark:bg-stone-900 dark:hover:border-amber-500/50"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 text-amber-700 transition-colors group-hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-400">
+            <Brain className="h-5 w-5" aria-hidden="true" />
+          </div>
+          <div className="mt-4">
+            <h2 className="text-sm font-semibold text-stone-900 dark:text-stone-100">
+              Memorizar
+            </h2>
+            <p className="mt-0.5 text-xs text-stone-500 dark:text-stone-400">
+              Práctica interactiva diaria
+            </p>
+          </div>
+        </Link>
+
+        <Link
+          href="/evangelizar"
+          className="group flex min-h-[44px] flex-col justify-between rounded-xl border border-stone-200/80 bg-white p-4 transition-all hover:border-amber-600/50 hover:shadow-xs dark:border-stone-800 dark:bg-stone-900 dark:hover:border-amber-500/50"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 text-amber-700 transition-colors group-hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-400">
+            <Share2 className="h-5 w-5" aria-hidden="true" />
+          </div>
+          <div className="mt-4">
+            <h2 className="text-sm font-semibold text-stone-900 dark:text-stone-100">
+              Evangelizar
+            </h2>
+            <p className="mt-0.5 text-xs text-stone-500 dark:text-stone-400">
+              Tarjetas para compartir
+            </p>
+          </div>
+        </Link>
+
+        <Link
+          href="/discipulado"
+          className="group flex min-h-[44px] flex-col justify-between rounded-xl border border-stone-200/80 bg-white p-4 transition-all hover:border-amber-600/50 hover:shadow-xs dark:border-stone-800 dark:bg-stone-900 dark:hover:border-amber-500/50"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 text-amber-700 transition-colors group-hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-400">
+            <Sprout className="h-5 w-5" aria-hidden="true" />
+          </div>
+          <div className="mt-4">
+            <h2 className="text-sm font-semibold text-stone-900 dark:text-stone-100">
+              Discipulado
+            </h2>
+            <p className="mt-0.5 text-xs text-stone-500 dark:text-stone-400">
+              Lecciones y fundamentos
+            </p>
+          </div>
+        </Link>
+      </section>
+
+      {/* Acceso a Buscador */}
+      <Link
+        href="/buscar"
+        className="flex min-h-[44px] items-center justify-between rounded-xl border border-dashed border-stone-300 bg-stone-50/50 px-4 py-3 text-sm text-stone-600 transition-colors hover:border-amber-600/60 hover:text-stone-900 dark:border-stone-700 dark:bg-stone-900/30 dark:text-stone-400 dark:hover:border-amber-500/60 dark:hover:text-stone-100"
+      >
+        <span className="flex items-center gap-2">
+          <Search className="h-4 w-4" aria-hidden="true" />
+          <span>Buscar pasajes o temas...</span>
+        </span>
+        <span className="text-xs text-stone-400 dark:text-stone-500">Abrir</span>
+      </Link>
+    </div>
   );
 }
