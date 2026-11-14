@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Geist, Lora } from "next/font/google";
 import { Header } from "@/components/Header";
@@ -37,10 +38,14 @@ export default function RootLayout({
       className={`${sansFont.variable} ${serifFont.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-stone-50 text-stone-900 selection:bg-amber-200 selection:text-stone-900 dark:bg-stone-950 dark:text-stone-100 dark:selection:bg-amber-950 dark:selection:text-amber-200">
-        <Header />
+        <Suspense>
+          <Header />
+        </Suspense>
         <main className="flex-1 pb-20 md:pb-0">{children}</main>
         <Footer />
-        <BottomNav />
+        <Suspense>
+          <BottomNav />
+        </Suspense>
       </body>
     </html>
   );

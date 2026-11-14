@@ -44,6 +44,7 @@ export interface ChapterSummary {
   bibleId: string;
   number: string;
   bookId: string;
+  reference?: string;
 }
 
 export interface Book {

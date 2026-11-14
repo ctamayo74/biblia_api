@@ -16,7 +16,8 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
 | **6** | 2026-11-14 | Registro continuo de pedidos | Bitácora viva en `docs/BITACORA.md` | `24eeb7a` |
 | **7** | 2026-11-14 | Capa de acceso a API.Bible y Route Handlers proxy | Tipos en `src/types/bible.ts`, cliente servidor en `src/lib/bible.ts` y 5 Route Handlers | `c12cd87` |
 | **8** | 2026-11-14 | Layout global, navegación móvil/escritorio y rutas base | `Header`, `BottomNav`, `Footer`, fuentes serif/sans y 5 rutas | `4eb2735` |
-| **9** | 2026-11-14 | Implementación de portada (`/`) con versículo diario | `src/data/verses.ts`, `src/lib/daily.ts`, `VerseCard`, `ShareButton` y PPR | `f96c841` |
+| **9** | 2026-11-14 | Implementación de portada (`/`) con versículo diario | `src/data/verses.ts`, `src/lib/daily.ts`, `VerseCard`, `ShareButton` y PPR | `0af818f` |
+| **10** | 2026-11-14 | Módulo de lectura `/leer` con libros, capítulos y visor | `/leer`, `/leer/[bookId]`, `/leer/[bookId]/[chapterId]`, `VersionSelector`, `FontSizeControl` | *Pendiente de commit* |
 
 ---
 
@@ -152,4 +153,26 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
   - Actualización de [`src/app/page.tsx`](../src/app/page.tsx) con arquitectura de **Partial Prerendering (PPR)** de Next.js 16 (`<Suspense fallback={<VerseCardSkeleton />}>`), garantizando renderizado instantáneo del cascarón estático y streaming del versículo dinámico.
   - Verificación exitosa de compilación (`Route (app): ◐ / (Partial Prerender)`).
 * **Archivos clave**: `src/data/verses.ts`, `src/lib/daily.ts`, `src/components/ShareButton.tsx`, `src/components/VerseCard.tsx`, `src/app/page.tsx`.
-* **Commit**: `f96c841` (`feat(home): muestra versículo del día con Server Component y botón compartir`).
+* **Commit**: `0af818f` (`feat(home): muestra versículo del día con Server Component y botón compartir`).
+
+---
+
+### Pedido 10: Módulo de Lectura (`/leer`) con Navegación de Libros y Capítulos
+* **Solicitud**:
+  1. `/leer` (Server Component): Lista de libros agrupados en Antiguo y Nuevo Testamento en una cuadrícula responsive.
+  2. `/leer/[bookId]` (Server Component con `await params`): Lista de capítulos del libro seleccionado.
+  3. `/leer/[bookId]/[chapterId]` (Server Component con `await params`): Visor del capítulo con `getChapter`, botones "Anterior" y "Siguiente" y breadcrumb.
+  4. Client Component `VersionSelector`: Selector de traducción conectado a `/api/bibles`, persistido en `localStorage` y propagado en la URL vía `searchParams`.
+  5. Client Component `FontSizeControl`: Ajuste de tamaño de fuente (`A-` / `A+`) persistido en `localStorage`, ancho óptimo de lectura de 65 caracteres (`max-w-[65ch]`) e interlineado amplio.
+* **Acciones ejecutadas**:
+  - Implementación de [`src/lib/canon.ts`](../src/lib/canon.ts) para agrupar canónicamente los 66 libros en Antiguo y Nuevo Testamento.
+  - Creación de funciones `getBook` y `getBookChapters` en [`src/lib/bible.ts`](../src/lib/bible.ts).
+  - Creación de [`src/components/VersionSelector.tsx`](../src/components/VersionSelector.tsx) (Client Component) con llamadas a `/api/bibles`, sincronización con `localStorage` y actualización reactiva de URL con `useTransition`.
+  - Creación de [`src/components/FontSizeControl.tsx`](../src/components/FontSizeControl.tsx) y [`src/components/ChapterReader.tsx`](../src/components/ChapterReader.tsx) (Client Component) con lectura cómoda editorial, párrafos justificados, ancho `65ch` y navegación entre capítulos.
+  - Creación de rutas dinámicas:
+    - [`src/app/leer/page.tsx`](../src/app/leer/page.tsx): Portada del lector con cuadrícula de libros agrupada.
+    - [`src/app/leer/[bookId]/page.tsx`](../src/app/leer/[bookId]/page.tsx): Selector de capítulos con migas de pan.
+    - [`src/app/leer/[bookId]/[chapterId]/page.tsx`](../src/app/leer/[bookId]/[chapterId]/page.tsx): Lector de capítulo completo con navegación anterior/siguiente.
+  - Configuración de suspensión con `Partial Prerendering (PPR)` en Next.js 16 para streaming de contenido dinámico.
+  - Verificación exitosa de compilación (`16/16` rutas válidas).
+* **Archivos clave**: `src/lib/canon.ts`, `src/components/VersionSelector.tsx`, `src/components/FontSizeControl.tsx`, `src/components/ChapterReader.tsx`, `src/app/leer/**/page.tsx`.

@@ -3,6 +3,7 @@ import type {
   Bible,
   Book,
   Chapter,
+  ChapterSummary,
   Passage,
   Verse,
   SearchResult,
@@ -104,6 +105,33 @@ export async function getBooks(bibleId: string): Promise<Book[]> {
   return fetchBibleApi<Book[]>(`/bibles/${encodeURIComponent(bibleId)}/books`, {
     "include-chapters": true,
   });
+}
+
+/**
+ * Obtiene los detalles de un libro específico.
+ */
+export async function getBook(bibleId: string, bookId: string): Promise<Book> {
+  if (!bibleId.trim() || !bookId.trim()) {
+    throw new Error("Los parámetros 'bibleId' y 'bookId' son obligatorios.");
+  }
+  return fetchBibleApi<Book>(
+    `/bibles/${encodeURIComponent(bibleId)}/books/${encodeURIComponent(bookId)}`
+  );
+}
+
+/**
+ * Obtiene la lista de capítulos de un libro.
+ */
+export async function getBookChapters(
+  bibleId: string,
+  bookId: string
+): Promise<ChapterSummary[]> {
+  if (!bibleId.trim() || !bookId.trim()) {
+    throw new Error("Los parámetros 'bibleId' y 'bookId' son obligatorios.");
+  }
+  return fetchBibleApi<ChapterSummary[]>(
+    `/bibles/${encodeURIComponent(bibleId)}/books/${encodeURIComponent(bookId)}/chapters`
+  );
 }
 
 /**
