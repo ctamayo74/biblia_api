@@ -22,7 +22,7 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
 | **12** | 2026-11-14 | Módulo de memorización con modos, niveles y racha | `/memorizar`, `MemorizationPractice`, ejercicios por modo, `useMemorizationProgress` | `cef8c11` |
 | **13** | 2026-11-14 | Re-especificación de `/memorizar` (lista, dominio 0-3, hook SSR) | `useLocalStorage`, `VerseList`, `PracticeCard`, `StreakBadge`, `AddVerseForm` | `bd2554b` |
 | **14** | 2026-11-14 | Guía de evangelismo paso a paso (`/evangelizar`) | `src/data/evangelio.ts`, `StepNavigator`, recorrido de 6 pasos con oración | `9f06b10` |
-| **15** | 2026-11-14 | Plan de discipulado de 7 días (`/discipulado`) | `plan-discipulado.ts`, `DayCheckbox`, progreso y notas en localStorage | *Pendiente de commit* |
+| **15** | 2026-11-14 | Plan de discipulado de 7 días (`/discipulado`) | `plan-discipulado.ts`, `DayCheckbox`, progreso y notas en localStorage | `59c8f9b` |
 
 ---
 
@@ -282,4 +282,4 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
   - **Nota sobre el estado HTTP**: con `cacheComponents` activado, el `notFound()` en tiempo de petición se ejecuta tras enviarse el shell, por lo que la respuesta conserva `200` con la UI 404 y `<meta name="robots" content="noindex">` (comportamiento documentado en Next 16; un 404 real exigiría comprobarlo en el Proxy).
   - Verificación: `npm run build` OK (`○ /discipulado` estático y `◐ /discipulado/[dia]` PPR con los 7 días prerenderizados), smoke test con `next start` (lista con títulos y progreso; detalle con pasaje, reflexión, oración, acción y notas; `/discipulado/99` muestra la UI 404 + `noindex`) y `npm run lint` sin hallazgos nuevos.
 * **Archivos clave**: `src/data/plan-discipulado.ts`, `src/types/discipleship.ts`, `src/hooks/useDiscipleshipProgress.ts`, `src/components/discipulado/*`, `src/app/discipulado/page.tsx`, `src/app/discipulado/[dia]/page.tsx`.
-* **Commit**: *(pendiente)*
+* **Commit**: `59c8f9b` (`feat(discipulado): plan de 7 dias con progreso, notas y detalle por dia`).
