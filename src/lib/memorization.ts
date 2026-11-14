@@ -1,87 +1,44 @@
 import type {
-  MemorizationLevelInfo,
-  MemorizationLevelValue,
-  MemorizationMode,
-  MemorizationModeInfo,
-  MemorizationProgress,
+  MasteryLevel,
+  MemorizationStore,
+  MemorizedVerse,
 } from "@/types/memorization";
 
-/** Clave de localStorage donde se guarda el progreso de memorización. */
-export const MEMORIZATION_STORAGE_KEY = "biblia_memorizar_progreso";
+/** Clave de localStorage donde se guarda la lista y la racha. */
+export const MEMORIZATION_STORAGE_KEY = "palabra-diaria:memorizar";
 
-/** Clave de localStorage donde se guardan las preferencias de práctica. */
-export const MEMORIZATION_PREFS_STORAGE_KEY = "biblia_memorizar_preferencias";
+/** Nivel de dominio máximo alcanzable. */
+export const MAX_MASTERY_LEVEL: MasteryLevel = 3;
 
-/** Catálogo de modos de práctica disponibles. */
-export const MEMORIZATION_MODES: MemorizationModeInfo[] = [
-  {
-    value: "completar",
-    label: "Completar",
-    description: "Rellena las palabras que se ocultan del versículo.",
-  },
-  {
-    value: "ordenar",
-    label: "Ordenar",
-    description: "Reconstruye el versículo ordenando sus palabras.",
-  },
-  {
-    value: "escribir",
-    label: "Escribir",
-    description: "Escribe el versículo completo de memoria.",
-  },
-];
+/** Porcentaje mínimo de acierto para considerar acertado el modo Recitar. */
+export const RECITE_SUCCESS_THRESHOLD = 80;
 
-/** Catálogo de niveles de dificultad. */
-export const MEMORIZATION_LEVELS: MemorizationLevelInfo[] = [
-  {
-    value: 1,
-    label: "Fácil",
-    description: "Muchas pistas y pocas palabras ocultas.",
-    hiddenRatio: 0.3,
-    preFilledRatio: 0.4,
-    hintRatio: 0.4,
-  },
-  {
-    value: 2,
-    label: "Intermedio",
-    description: "Equilibrio entre pistas y esfuerzo.",
-    hiddenRatio: 0.5,
-    preFilledRatio: 0.25,
-    hintRatio: 0.25,
-  },
-  {
-    value: 3,
-    label: "Difícil",
-    description: "Casi sin pistas: memorización real.",
-    hiddenRatio: 0.7,
-    preFilledRatio: 0.1,
-    hintRatio: 0.1,
-  },
-  {
-    value: 4,
-    label: "Maestría",
-    description: "Sin ayudas: recítalo de memoria.",
-    hiddenRatio: 1,
-    preFilledRatio: 0,
-    hintRatio: 0,
-  },
-];
-
-/** Progreso inicial de un usuario nuevo. */
-export const EMPTY_PROGRESS: MemorizationProgress = {
+/** Estado inicial de un usuario nuevo. */
+export const EMPTY_STORE: MemorizationStore = {
+  verses: [],
   streak: 0,
-  bestStreak: 0,
-  lastPracticedDate: null,
-  totalSessions: 0,
-  masteredVerseIds: [],
+  lastPracticeDate: null,
 };
 
-/** Devuelve la configuración de un nivel por su valor. */
-export function getLevelInfo(value: MemorizationLevelValue): MemorizationLevelInfo {
-  return (
-    MEMORIZATION_LEVELS.find((level) => level.value === value) ??
-    MEMORIZATION_LEVELS[0]
-  );
+/** Etiquetas legibles de cada nivel de dominio. */
+export const MASTERY_LABELS: Record<MasteryLevel, string> = {
+  0: "Nuevo",
+  1: "Aprendiendo",
+  2: "Casi dominado",
+  3: "Dominado",
+};
+
+/** Patrón de referencia de API.Bible: LIBRO.CAPÍTULO.VERSÍCULO (ej. ROM.8.28, 1CO.10.13). */
+const VERSE_ID_PATTERN = /^(?:[1-3][A-Z]{2}|[A-Z]{3})\.\d{1,3}\.\d{1,3}$/;
+
+/** Normaliza una referencia escrita por el usuario (mayúsculas y sin espacios). */
+export function normalizeVerseId(input: string): string {
+  return input.trim().toUpperCase().replace(/\s+/g, "");
+}
+
+/** Valida el formato de una referencia de versículo (ej. "ROM.8.28"). */
+export function isValidVerseId(referenceId: string): boolean {
+  return VERSE_ID_PATTERN.test(referenceId);
 }
 
 /** Divide el texto bíblico en palabras, descartando espacios vacíos. */
@@ -89,18 +46,13 @@ export function tokenizeVerse(text: string): string[] {
   return text.split(/\s+/).filter((word) => word.length > 0);
 }
 
-/** Normaliza una palabra para comparaciones tolerantes (sin tildes, mayúsculas ni signos). */
+/** Normaliza una palabra (sin tildes, mayúsculas ni signos) para comparaciones. */
 export function normalizeWord(word: string): string {
   return word
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/[^\p{L}\p{N}]/gu, "");
-}
-
-/** Normaliza una frase completa para comparaciones tolerantes. */
-export function normalizePhrase(text: string): string {
-  return tokenizeVerse(text).map(normalizeWord).join(" ");
 }
 
 /** Genera un entero sin signo estable a partir de una cadena. */
@@ -123,19 +75,6 @@ export function createSeededRandom(seed: string): () => number {
     temp = (temp + Math.imul(temp ^ (temp >>> 7), 61 | temp)) ^ temp;
     return ((temp ^ (temp >>> 14)) >>> 0) / 4294967296;
   };
-}
-
-/** Baraja una lista de palabras de forma determinista. */
-export function shuffleWords(words: string[], seed: string): string[] {
-  const result = [...words];
-  const random = createSeededRandom(seed);
-
-  for (let index = result.length - 1; index > 0; index -= 1) {
-    const swapIndex = Math.floor(random() * (index + 1));
-    [result[index], result[swapIndex]] = [result[swapIndex], result[index]];
-  }
-
-  return result;
 }
 
 /**
@@ -167,8 +106,47 @@ export function getHiddenWordIndices(
   return indices.slice(0, targetCount).sort((a, b) => a - b);
 }
 
-/** Devuelve la fecha de hoy en formato ISO corto (UTC). */
-export function getTodayKey(date: Date = new Date()): string {
+/** Proporción de palabras a ocultar en el modo Completar según el dominio. */
+export function getHiddenRatioForMastery(level: MasteryLevel): number {
+  return Math.min(0.75, 0.3 + level * 0.15);
+}
+
+/**
+ * Calcula el porcentaje de acierto (0-100) entre el texto esperado y el escrito.
+ * Usa la subsecuencia común más larga sobre palabras normalizadas, por lo que
+ * ignora mayúsculas, signos y es tolerante a palabras faltantes o de más.
+ */
+export function computeAccuracy(expected: string, given: string): number {
+  const expectedWords = tokenizeVerse(expected)
+    .map(normalizeWord)
+    .filter(Boolean);
+  const givenWords = tokenizeVerse(given).map(normalizeWord).filter(Boolean);
+
+  if (expectedWords.length === 0 || givenWords.length === 0) {
+    return 0;
+  }
+
+  const rows = expectedWords.length + 1;
+  const cols = givenWords.length + 1;
+  const matrix: number[][] = Array.from({ length: rows }, () =>
+    new Array<number>(cols).fill(0)
+  );
+
+  for (let row = 1; row < rows; row += 1) {
+    for (let col = 1; col < cols; col += 1) {
+      matrix[row][col] =
+        expectedWords[row - 1] === givenWords[col - 1]
+          ? matrix[row - 1][col - 1] + 1
+          : Math.max(matrix[row - 1][col], matrix[row][col - 1]);
+    }
+  }
+
+  const longest = matrix[rows - 1][cols - 1];
+  return Math.round((2 * longest) / (expectedWords.length + givenWords.length) * 100);
+}
+
+/** Fecha de hoy en formato ISO corto (UTC). */
+export function getDateKey(date: Date = new Date()): string {
   return date.toISOString().slice(0, 10);
 }
 
@@ -184,113 +162,131 @@ function daysBetween(fromKey: string, toKey: string): number {
   return Math.round((to - from) / 86400000);
 }
 
-/** Indica si el usuario ya practicó en la fecha indicada. */
+/** Indica si ya se practicó hoy. */
 export function hasPracticedToday(
-  progress: MemorizationProgress,
+  store: MemorizationStore,
   date: Date = new Date()
 ): boolean {
-  return progress.lastPracticedDate === getTodayKey(date);
+  return store.lastPracticeDate === getDateKey(date);
 }
 
 /**
- * Registra una sesión completada y recalcula la racha.
- * - Misma fecha: no incrementa la racha.
- * - Día consecutivo: incrementa la racha.
- * - Hueco mayor: reinicia la racha a 1.
+ * Registra una práctica de un versículo.
+ * - Actualiza la racha según los días consecutivos.
+ * - Si `mastered` es verdadero, sube el nivel de dominio (máximo 3).
  */
-export function registerPractice(
-  progress: MemorizationProgress,
+export function recordPractice(
+  store: MemorizationStore,
   verseId: string,
-  date: Date = new Date()
-): MemorizationProgress {
-  const today = getTodayKey(date);
-  const alreadyPracticedToday = progress.lastPracticedDate === today;
+  options: { mastered: boolean },
+  now: Date = new Date()
+): MemorizationStore {
+  const today = getDateKey(now);
+  const alreadyToday = store.lastPracticeDate === today;
 
-  let streak = progress.streak;
-
-  if (!alreadyPracticedToday) {
-    const gap = progress.lastPracticedDate
-      ? daysBetween(progress.lastPracticedDate, today)
+  let streak = store.streak;
+  if (!alreadyToday) {
+    const gap = store.lastPracticeDate
+      ? daysBetween(store.lastPracticeDate, today)
       : Number.POSITIVE_INFINITY;
-
-    streak = gap === 1 ? progress.streak + 1 : 1;
+    streak = gap === 1 ? store.streak + 1 : 1;
   }
 
-  const masteredVerseIds = progress.masteredVerseIds.includes(verseId)
-    ? progress.masteredVerseIds
-    : [...progress.masteredVerseIds, verseId];
+  const verses = store.verses.map((verse) => {
+    if (verse.id !== verseId) {
+      return verse;
+    }
+
+    const nextLevel = options.mastered
+      ? (Math.min(MAX_MASTERY_LEVEL, verse.masteryLevel + 1) as MasteryLevel)
+      : verse.masteryLevel;
+
+    return {
+      ...verse,
+      masteryLevel: nextLevel,
+      lastPracticedAt: now.toISOString(),
+    };
+  });
+
+  return { verses, streak, lastPracticeDate: today };
+}
+
+/** Comprueba que un objeto tenga la forma de un versículo memorizado. */
+function isMemorizedVerse(value: unknown): value is MemorizedVerse {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  const candidate = value as Partial<MemorizedVerse>;
+  return (
+    typeof candidate.id === "string" &&
+    typeof candidate.reference === "string" &&
+    typeof candidate.text === "string"
+  );
+}
+
+/** Normaliza un versículo leído de localStorage. */
+function sanitizeVerse(verse: MemorizedVerse): MemorizedVerse {
+  const level = Math.min(
+    MAX_MASTERY_LEVEL,
+    Math.max(0, Math.floor(Number(verse.masteryLevel) || 0))
+  ) as MasteryLevel;
 
   return {
-    streak,
-    bestStreak: Math.max(progress.bestStreak, streak),
-    lastPracticedDate: today,
-    totalSessions: alreadyPracticedToday
-      ? progress.totalSessions
-      : progress.totalSessions + 1,
-    masteredVerseIds,
+    id: verse.id,
+    reference: verse.reference,
+    text: verse.text,
+    startedAt:
+      typeof verse.startedAt === "string"
+        ? verse.startedAt
+        : new Date().toISOString(),
+    masteryLevel: level,
+    lastPracticedAt:
+      typeof verse.lastPracticedAt === "string" ? verse.lastPracticedAt : null,
   };
 }
 
-/** Valida y normaliza un progreso leído de localStorage. */
-export function parseProgress(raw: string | null): MemorizationProgress {
-  if (!raw) {
-    return EMPTY_PROGRESS;
-  }
-
+/** Valida y normaliza el estado leído de localStorage. */
+export function parseStore(raw: string): MemorizationStore {
   try {
-    const parsed = JSON.parse(raw) as Partial<MemorizationProgress>;
+    const parsed = JSON.parse(raw) as Partial<MemorizationStore>;
+
+    const verses = Array.isArray(parsed.verses)
+      ? parsed.verses.filter(isMemorizedVerse).map(sanitizeVerse)
+      : [];
+
+    const streak =
+      typeof parsed.streak === "number" && Number.isFinite(parsed.streak)
+        ? Math.max(0, Math.floor(parsed.streak))
+        : 0;
 
     return {
-      streak: typeof parsed.streak === "number" ? parsed.streak : 0,
-      bestStreak: typeof parsed.bestStreak === "number" ? parsed.bestStreak : 0,
-      lastPracticedDate:
-        typeof parsed.lastPracticedDate === "string"
-          ? parsed.lastPracticedDate
+      verses,
+      streak,
+      lastPracticeDate:
+        typeof parsed.lastPracticeDate === "string"
+          ? parsed.lastPracticeDate
           : null,
-      totalSessions:
-        typeof parsed.totalSessions === "number" ? parsed.totalSessions : 0,
-      masteredVerseIds: Array.isArray(parsed.masteredVerseIds)
-        ? parsed.masteredVerseIds.filter(
-            (id): id is string => typeof id === "string"
-          )
-        : [],
     };
   } catch {
-    return EMPTY_PROGRESS;
+    return EMPTY_STORE;
   }
 }
 
-/** Preferencias de práctica persistidas (modo y nivel elegidos). */
-export interface MemorizationPreferences {
-  mode: MemorizationMode;
-  level: MemorizationLevelValue;
-}
-
-/** Preferencias por defecto para un usuario nuevo. */
-export const DEFAULT_PREFERENCES: MemorizationPreferences = {
-  mode: "completar",
-  level: 2,
-};
-
-/** Valida y normaliza las preferencias leídas de localStorage. */
-export function parsePreferences(raw: string | null): MemorizationPreferences {
-  if (!raw) {
-    return DEFAULT_PREFERENCES;
+/** Formatea una fecha ISO en un texto corto en español (ej. "14 nov 2026"). */
+export function formatShortDate(isoDate: string | null): string {
+  if (!isoDate) {
+    return "Sin practicar";
   }
 
-  try {
-    const parsed = JSON.parse(raw) as Partial<MemorizationPreferences>;
-
-    const mode = MEMORIZATION_MODES.some((item) => item.value === parsed.mode)
-      ? (parsed.mode as MemorizationMode)
-      : DEFAULT_PREFERENCES.mode;
-
-    const level = MEMORIZATION_LEVELS.some((item) => item.value === parsed.level)
-      ? (parsed.level as MemorizationLevelValue)
-      : DEFAULT_PREFERENCES.level;
-
-    return { mode, level };
-  } catch {
-    return DEFAULT_PREFERENCES;
+  const date = new Date(isoDate);
+  if (Number.isNaN(date.getTime())) {
+    return "Sin practicar";
   }
+
+  return date.toLocaleDateString("es-ES", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 }

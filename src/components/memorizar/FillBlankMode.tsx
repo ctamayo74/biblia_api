@@ -2,36 +2,42 @@
 
 import { useMemo, useState } from "react";
 import { Check, CircleCheck, CircleX, Eye, RotateCcw } from "lucide-react";
-import type { MemorizationLevelValue } from "@/types/memorization";
 import {
+  getHiddenRatioForMastery,
   getHiddenWordIndices,
-  getLevelInfo,
   normalizeWord,
+  tokenizeVerse,
 } from "@/lib/memorization";
+import type { MasteryLevel } from "@/types/memorization";
 
-interface FillBlanksExerciseProps {
-  words: string[];
-  level: MemorizationLevelValue;
-  seed: string;
-  onComplete: () => void;
+interface FillBlankModeProps {
+  verseId: string;
+  text: string;
+  masteryLevel: MasteryLevel;
+  onSuccess: () => void;
 }
 
-export function FillBlanksExercise({
-  words,
-  level,
-  seed,
-  onComplete,
-}: FillBlanksExerciseProps) {
-  const levelInfo = getLevelInfo(level);
-
-  const hiddenIndices = useMemo(
-    () => getHiddenWordIndices(words, levelInfo.hiddenRatio, `${seed}-blanks`),
-    [words, levelInfo.hiddenRatio, seed]
-  );
-
+/** Modo Completar: oculta palabras al azar y el usuario las escribe. */
+export function FillBlankMode({
+  verseId,
+  text,
+  masteryLevel,
+  onSuccess,
+}: FillBlankModeProps) {
+  const words = useMemo(() => tokenizeVerse(text), [text]);
+  const [attempt, setAttempt] = useState(0);
   const [values, setValues] = useState<Record<number, string>>({});
   const [checked, setChecked] = useState(false);
   const [revealed, setRevealed] = useState(false);
+
+  // Congela la dificultad al montar para no reordenar las palabras ocultas
+  // si el nivel de dominio sube justo después de acertar.
+  const [ratio, setRatio] = useState(() => getHiddenRatioForMastery(masteryLevel));
+
+  const hiddenIndices = useMemo(
+    () => getHiddenWordIndices(words, ratio, `${verseId}-${attempt}`),
+    [words, ratio, verseId, attempt]
+  );
 
   function isCorrect(index: number): boolean {
     const expected = normalizeWord(words[index]);
@@ -40,14 +46,10 @@ export function FillBlanksExercise({
 
   const allCorrect = hiddenIndices.every(isCorrect);
 
-  function handleChange(index: number, value: string) {
-    setValues((current) => ({ ...current, [index]: value }));
-  }
-
   function handleCheck() {
     setChecked(true);
     if (hiddenIndices.every(isCorrect)) {
-      onComplete();
+      onSuccess();
     }
   }
 
@@ -65,6 +67,8 @@ export function FillBlanksExercise({
     setValues({});
     setChecked(false);
     setRevealed(false);
+    setRatio(getHiddenRatioForMastery(masteryLevel));
+    setAttempt((current) => current + 1);
   }
 
   return (
@@ -101,13 +105,18 @@ export function FillBlanksExercise({
               spellCheck={false}
               aria-label={`Palabra ${index + 1} de ${words.length}`}
               value={values[index] ?? ""}
-              onChange={(event) => handleChange(index, event.target.value)}
+              onChange={(event) =>
+                setValues((current) => ({
+                  ...current,
+                  [index]: event.target.value,
+                }))
+              }
               style={{ width: `${Math.max(word.length, 5) + 2}ch` }}
               className={`mr-2 mb-1 inline-block min-h-[40px] rounded-lg border-2 bg-white px-2 text-center font-serif text-base align-middle text-stone-900 outline-hidden transition-colors dark:bg-stone-900 dark:text-stone-100 ${
                 checked
                   ? correct
-                    ? "border-emerald-500 dark:border-emerald-500"
-                    : "border-rose-500 dark:border-rose-500"
+                    ? "border-emerald-500"
+                    : "border-rose-500"
                   : "border-dashed border-amber-600/70 focus:border-amber-600 dark:border-amber-500/70"
               }`}
             />
@@ -127,7 +136,7 @@ export function FillBlanksExercise({
           {allCorrect ? (
             <>
               <CircleCheck className="h-4 w-4" aria-hidden="true" />
-              ¡Correcto! Has completado el versículo.
+              ¡Correcto! Subiste tu nivel de dominio.
             </>
           ) : (
             <>
@@ -160,7 +169,7 @@ export function FillBlanksExercise({
         <button
           type="button"
           onClick={handleReset}
-          aria-label="Reiniciar ejercicio"
+          aria-label="Generar otras palabras ocultas"
           className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-stone-300 bg-white px-3 py-2 text-stone-600 shadow-2xs transition-colors hover:bg-stone-50 active:scale-95 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700"
         >
           <RotateCcw className="h-4 w-4" aria-hidden="true" />

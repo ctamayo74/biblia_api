@@ -20,6 +20,7 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
 | **10** | 2026-11-14 | Módulo de lectura `/leer` con libros, capítulos y visor | `/leer`, `/leer/[bookId]`, `/leer/[bookId]/[chapterId]`, `VersionSelector`, `FontSizeControl` | `5c6d90c` |
 | **11** | 2026-11-14 | Política de documentación previa de cada pedido | Bitácora actualizada al inicio de cada solicitud | `ecd84b2` |
 | **12** | 2026-11-14 | Módulo de memorización con modos, niveles y racha | `/memorizar`, `MemorizationPractice`, ejercicios por modo, `useMemorizationProgress` | `cef8c11` |
+| **13** | 2026-11-14 | Re-especificación de `/memorizar` (lista, dominio 0-3, hook SSR) | `useLocalStorage`, `VerseList`, `PracticeCard`, `StreakBadge`, `AddVerseForm` | *Pendiente de commit* |
 
 ---
 
@@ -214,3 +215,27 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
   - Verificación: `npm run build` OK (`◐ /memorizar` Partial Prerender) y prueba real con `next start` (`?ref=PHP.4.13` y ref inválida).
 * **Archivos clave**: `src/types/memorization.ts`, `src/lib/memorization.ts`, `src/hooks/useMemorizationProgress.ts`, `src/hooks/useMemorizationPreferences.ts`, `src/components/memorizar/*`, `src/app/memorizar/page.tsx`.
 * **Commit**: `cef8c11` (`feat(memorizar): agrega práctica de memorización con modos, niveles y racha en localStorage`).
+
+---
+
+### Pedido 13: Re-especificación de `/memorizar` (Lista, Dominio 0-3 y Hook SSR)
+* **Solicitud**: Reimplementar `/memorizar` como herramienta de memorización diaria, principalmente **Client Component** con `useState`/`useEffect`, con estos requisitos:
+  1. Estado persistido en `localStorage`: lista de versículos en memorización (referencia, texto, fecha de inicio, **nivel de dominio 0-3** y última práctica) y **racha de días consecutivos**.
+  2. Hook propio [`src/hooks/useLocalStorage.ts`](../src/hooks/useLocalStorage.ts) **seguro para SSR** (lee `localStorage` solo dentro de `useEffect`).
+  3. Flujo de práctica por versículo con 3 modos: **Leer**, **Completar** (palabras al azar ocultas) y **Recitar** (de memoria, con **porcentaje de acierto** y tolerancia a mayúsculas y signos).
+  4. Al acertar sube el nivel de dominio y la racha; racha visible con contador.
+  5. Si la URL trae `?ref=JHN.3.16` (botón del home), obtener el texto desde `/api/verse` y agregarlo a la lista.
+  6. Campo para agregar versículos por referencia (ej. `ROM.8.28`) con **validación de formato**.
+  7. Dividir en componentes pequeños: `VerseList`, `PracticeCard`, `StreakBadge`, `AddVerseForm` (sin concentrar toda la lógica en un archivo).
+* **Nota**: Reemplaza la implementación del Pedido 12 (se eliminan los componentes/hooks anteriores del módulo).
+* **Acciones ejecutadas**:
+  - Hook genérico SSR-safe [`src/hooks/useLocalStorage.ts`](../src/hooks/useLocalStorage.ts): estado inicial = valor por defecto (sin desajuste de hidratación), lectura de `localStorage` dentro de `useEffect`, opción `parse` para sanear datos y `isLoaded`.
+  - Modelo en [`src/types/memorization.ts`](../src/types/memorization.ts): `MemorizedVerse` (referencia, texto, fecha de inicio, dominio 0-3, última práctica) y `MemorizationStore` (versículos, racha, última fecha).
+  - Lógica pura en [`src/lib/memorization.ts`](../src/lib/memorization.ts): validación/normalización de referencias (`LIBRO.CAPÍTULO.VERSÍCULO`), tokenización, ocultamiento determinista de palabras, `computeAccuracy` por subsecuencia común más larga (tolera mayúsculas y signos), `recordPractice` (racha + dominio) y `parseStore` con saneamiento.
+  - Componentes en [`src/components/memorizar/`](../src/components/memorizar/): `StreakBadge`, `AddVerseForm`, `VerseList`, `PracticeCard` y los modos `ReadingMode`, `FillBlankMode` y `ReciteMode` (con medidor de acierto).
+  - Orquestador cliente [`MemorizationTool.tsx`](../src/components/memorizar/MemorizationTool.tsx): `useLocalStorage`, lectura de `?ref=` con `useSearchParams`, alta vía `/api/verse`, selección y eliminación de versículos.
+  - Página [`src/app/memorizar/page.tsx`](../src/app/memorizar/page.tsx): Server Component delgado con `metadata` y `Suspense` que monta el Client Component.
+  - Eliminación de los archivos del Pedido 12 (`MemorizationPractice`, `MemorizationStreak`, selectores, `VersePicker`, ejercicios y hooks de progreso/preferencias).
+  - **Corrección (Fix)**: el patrón de referencia no aceptaba libros numerados de dos letras (`1CO.10.13`, `2TI.3.16`, `1JN.4.19`); se ajustó a `^(?:[1-3][A-Z]{2}|[A-Z]{3})\.\d{1,3}\.\d{1,3}$`.
+  - Verificación: pruebas de lógica pura en Node (31/31 OK: validación, acierto, ocultamiento, racha y dominio), `npm run build` OK (`○ /memorizar` estático) y smoke test con `next start` (`/memorizar`, `?ref=JHN.3.16` y `/api/verse`).
+* **Archivos clave**: `src/hooks/useLocalStorage.ts`, `src/types/memorization.ts`, `src/lib/memorization.ts`, `src/components/memorizar/*`, `src/app/memorizar/page.tsx`.
