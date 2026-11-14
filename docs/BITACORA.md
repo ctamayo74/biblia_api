@@ -21,7 +21,7 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
 | **11** | 2026-11-14 | Política de documentación previa de cada pedido | Bitácora actualizada al inicio de cada solicitud | `ecd84b2` |
 | **12** | 2026-11-14 | Módulo de memorización con modos, niveles y racha | `/memorizar`, `MemorizationPractice`, ejercicios por modo, `useMemorizationProgress` | `cef8c11` |
 | **13** | 2026-11-14 | Re-especificación de `/memorizar` (lista, dominio 0-3, hook SSR) | `useLocalStorage`, `VerseList`, `PracticeCard`, `StreakBadge`, `AddVerseForm` | `bd2554b` |
-| **14** | 2026-11-14 | Guía de evangelismo paso a paso (`/evangelizar`) | `src/data/evangelio.ts`, `StepNavigator`, recorrido de 6 pasos con oración | *Pendiente de commit* |
+| **14** | 2026-11-14 | Guía de evangelismo paso a paso (`/evangelizar`) | `src/data/evangelio.ts`, `StepNavigator`, recorrido de 6 pasos con oración | `9f06b10` |
 
 ---
 
@@ -260,4 +260,4 @@ Este documento registra cronológicamente cada solicitud realizada, las acciones
   - **Formato de rangos**: los pasajes con rango deben repetir libro y capítulo (`EPH.2.8-EPH.2.9`, `ROM.10.9-ROM.10.10`); la forma abreviada (`EPH.2.8-9`) devuelve HTTP 502 (400 de API.Bible). Verificado contra la API en vivo.
   - Verificación: `npm run build` OK (`◐ /evangelizar` Partial Prerender), smoke test con `next start` (HTTP 200 con los 6 pasajes, referencias, "Paso 1 de 6" y "Compartir este paso" en el HTML; el cierre en el bundle cliente) y `npm run lint` sin hallazgos nuevos.
 * **Archivos clave**: `src/data/evangelio.ts`, `src/types/evangelism.ts`, `src/components/evangelizar/*`, `src/app/evangelizar/page.tsx`, `src/components/ShareButton.tsx`.
-* **Commit**: *(pendiente)*
+* **Commit**: `9f06b10` (`feat(evangelizar): guia paso a paso para compartir el evangelio con oracion y siguientes pasos`).
